@@ -19,4 +19,18 @@ api.interceptors.request.use(
   }
 );
 
+export const authService = {
+  login: (credentials) => api.post('/auth/login', credentials),
+  register: (userData) => api.post('/auth/register', userData),
+  getMe: () => api.get('/auth/me')
+};
+
+export const modelService = {
+  predict: async (features) => {
+    // The ML API runs on a separate Flask port 5000 in this setup
+    const response = await axios.post('http://localhost:5000/predict', features);
+    return response.data;
+  }
+};
+
 export default api;
