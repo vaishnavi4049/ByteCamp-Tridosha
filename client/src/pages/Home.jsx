@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import ccImage from '../assets/cc.png';
 
 const Home = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <div style={{ minHeight: '100vh', width: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
@@ -61,9 +61,40 @@ const Home = () => {
 
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', borderLeft: '1px solid rgba(255, 255, 255, 0.1)', paddingLeft: '1.5rem' }}>
             {user ? (
-              <Link to="/dashboard" className="btn-primary" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '10px 20px' }}>
-                Open App <ArrowRight size={16} />
-              </Link>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <Link to="/dashboard" className="btn-primary" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '8px 16px', fontSize: '0.95rem' }}>
+                  Open App <ArrowRight size={16} />
+                </Link>
+                <button
+                  onClick={async () => {
+                    try {
+                      await logout();
+                      window.location.href = "/";
+                    } catch (err) {
+                      console.error("Logout failed", err);
+                    }
+                  }}
+                  style={{
+                    color: 'white',
+                    background: 'transparent',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '0.95rem',
+                    fontWeight: '500',
+                    transition: 'all 0.2s',
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                  }}
+                >
+                  Logout
+                </button>
+              </div>
             ) : (
               <>
                 <Link to="/login" style={{
@@ -133,9 +164,15 @@ const Home = () => {
             </p>
 
             <div className="delay-200" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/register" className="btn-primary" style={{ padding: '14px 28px', fontSize: '1rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem', width: 'auto' }}>
-                <Activity size={18} /> Generate My Optimal Schedule
-              </Link>
+              {user ? (
+                <Link to="/dashboard" className="btn-primary" style={{ padding: '14px 28px', fontSize: '1rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem', width: 'auto' }}>
+                  <Activity size={18} /> Go To Dashboard
+                </Link>
+              ) : (
+                <Link to="/register" className="btn-primary" style={{ padding: '14px 28px', fontSize: '1rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem', width: 'auto' }}>
+                  <Activity size={18} /> Generate My Optimal Schedule
+                </Link>
+              )}
             </div>
           </div>
 
@@ -217,9 +254,15 @@ const Home = () => {
             <h2 style={{ fontSize: '2.5rem', fontWeight: '700', color: 'white', marginBottom: '1.5rem', letterSpacing: '-0.02em' }}>Ready to optimize your treatment?</h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: '2.5rem', maxWidth: '600px', margin: '0 auto 2.5rem' }}>Join the thousand of patients already experiencing the clinical benefits of chronobiology-aware prescription intelligence.</p>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <Link to="/register" className="btn-primary" style={{ display: 'inline-flex', padding: '16px 40px', fontSize: '1.1rem', width: 'auto', textDecoration: 'none', alignItems: 'center', gap: '0.5rem' }}>
-                Build My Profile <ChevronRight size={20} />
-              </Link>
+              {user ? (
+                <Link to="/dashboard" className="btn-primary" style={{ display: 'inline-flex', padding: '16px 40px', fontSize: '1.1rem', width: 'auto', textDecoration: 'none', alignItems: 'center', gap: '0.5rem' }}>
+                  Go To Dashboard <ChevronRight size={20} />
+                </Link>
+              ) : (
+                <Link to="/register" className="btn-primary" style={{ display: 'inline-flex', padding: '16px 40px', fontSize: '1.1rem', width: 'auto', textDecoration: 'none', alignItems: 'center', gap: '0.5rem' }}>
+                  Build My Profile <ChevronRight size={20} />
+                </Link>
+              )}
             </div>
           </div>
         </section>

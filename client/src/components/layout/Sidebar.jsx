@@ -7,9 +7,13 @@ const Sidebar = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      window.location.href = '/';
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
   };
 
   const navItems = [
@@ -36,10 +40,9 @@ const Sidebar = () => {
             to={item.path}
             end={item.path === '/dashboard'}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 no-underline ${
-                isActive
-                  ? 'bg-brand-500/10 text-brand-400 border border-brand-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
-                  : 'text-text-secondary hover:text-white hover:bg-white/5 border border-transparent'
+              `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 no-underline ${isActive
+                ? 'bg-brand-500/10 text-brand-400 border border-brand-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
+                : 'text-text-secondary hover:text-white hover:bg-white/5 border border-transparent'
               }`
             }
           >

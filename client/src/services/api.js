@@ -1,34 +1,23 @@
-import axios from 'axios';
+import axios from "axios";
 
-// Create an Axios instance
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api', // Adjust according to your backend config
+  baseURL: "http://localhost:5000/api",
+  withCredentials: true // VERY IMPORTANT for cookies
 });
 
-// Add a request interceptor to include the auth token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
 export const authService = {
-  login: (credentials) => api.post('/auth/login', credentials),
-  register: (userData) => api.post('/auth/register', userData),
-  getMe: () => api.get('/auth/me')
+  login: (credentials) => api.post("/auth/login", credentials),
+  register: (userData) => api.post("/auth/register", userData),
+  getMe: () => api.get("/auth/me"),
+  logout: () => api.post("/auth/logout")
 };
 
 export const modelService = {
   predict: async (features) => {
-    // The ML API runs on a separate Flask port 5000 in this setup
-    const response = await axios.post('http://localhost:5000/predict', features);
+    const response = await axios.post(
+      "http://localhost:5000/predict",
+      features
+    );
     return response.data;
   }
 };
