@@ -1,0 +1,102 @@
+[
+    {
+        "id": "dc386725-c125-497a-b489-87c977073fd3",
+        "patient_id": "demo@example.com",
+        "condition": "Hypertension",
+        "ai_time": 23,
+        "doctor_time": 18,
+        "improvement_score": 6.9635840578092685,
+        "patient_parameters": {
+            "age": 45,
+            "sleep_duration": 7.5,
+            "heart_rate": 72,
+            "stress": 3,
+            "glucose": 120,
+            "cholesterol": 210,
+            "gender": 1,
+            "condition": 0,
+            "condition_name": "Hypertension",
+            "drug": 4,
+            "dosage": 500,
+            "duration": 30
+        },
+        "status": "rejected",
+        "timestamp": "2026-03-14T20:43:02.636714",
+        "final_time": 19
+    },
+    {
+        "id": "a24a7126-ab41-4e31-8505-eff747fcab4a",
+        "patient_id": "user@example.com",
+        "condition": "Hypertension",
+        "ai_time": 23,
+        "doctor_time": 18,
+        "improvement_score": 7.2097016596930565,
+        "patient_parameters": {
+            "age": "89",
+            "sleep_duration": "8",
+            "heart_rate": "133",
+            "stress": "1",
+            "glucose": "122",
+            "cholesterol": "239",
+            "gender": "0",
+            "condition": "0",
+            "condition_name": "Hypertension",
+            "drug": "2",
+            "dosage": "298",
+            "duration": "30"
+        },
+        "status": "rejected",
+        "timestamp": "2026-03-14T20:48:46.138406",
+        "final_time": 20
+    },
+    {
+        "id": "d822eca6-46f4-4cc6-9dca-c4ecf58a6d6b",
+        "patient_id": "demo@example.com",
+        "condition": "Hypertension",
+        "ai_time": 22,
+        "doctor_time": 18,
+        "improvement_score": 60,
+        "patient_parameters": {
+            "age": 45,
+            "sleep_duration": 7.5,
+            "heart_rate": 72,
+            "stress": 3,
+            "glucose": 120,
+            "cholesterol": 210,
+            "gender": 1,
+            "condition": 0,
+            "condition_name": "Hypertension",
+            "drug": 4,
+            "dosage": 500,
+            "duration": 30
+        },
+        "status": "rejected",
+        "timestamp": "2026-03-14T22:43:25.449324",
+        "final_time": 19
+    },
+    {
+        "id": "c52c7b26-4ebd-461a-a686-c63e002e4202",
+        "patient_id": "demo@example.com",
+        "condition": "Hypertension",
+        "ai_time": 22,
+        "doctor_time": 18,
+        "improvement_score": 60,
+        "patient_parameters": {
+            "age": 45,
+            "sleep_duration": 7.5,
+            "heart_rate": 72,
+            "stress": 3,
+            "glucose": 120,
+            "cholesterol": 210,
+            "gender": 1,
+            "condition": 0,
+            "condition_name": "Hypertension",
+            "drug": 4,
+            "dosage": 500,
+            "duration": 30
+        },
+        "status": "rejected",
+        "timestamp": "2026-03-14T22:44:56.019016",
+        "final_time": 19
+    }
+]
