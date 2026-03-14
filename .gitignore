@@ -1,4 +1,6 @@
+
 # Logs
+
 logs
 *.log
 npm-debug.log*
@@ -8,12 +10,14 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # Node
+
 node_modules/
 dist/
 dist-ssr/
 build/
 
 # IDEs and Editors
+
 .vscode/
 !.vscode/extensions.json
 .idea/
@@ -25,6 +29,23 @@ build/
 .DS_Store
 
 # Environment
+
 .env
 .env.local
 .env.*.local
+
+# Python
+
+**pycache**/
+*.pyc
+*.pyo
+*.pyd
+
+# ML Models (very important for GitHub limit)
+
+*.pkl
+dataset/model/*.pkl
+
+# OS files
+
+Thumbs.db
