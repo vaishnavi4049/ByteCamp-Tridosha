@@ -13,12 +13,13 @@ export const AuthProvider = ({ children }) => {
     // Check if user is logged in on mount
     const checkAuth = async () => {
       const token = localStorage.getItem('token');
+      // For now, if we have a token, we pretend the user is still valid or decode it.
+      // A more robust implementation would ping a /auth/me endpoint.
       if (token) {
         try {
-          // Verify token or fetch user profile
-          // const res = await api.get('/auth/me');
-          // setUser(res.data.user);
-          setUser({ email: 'user@example.com' }); // Mock for now until backend is tied in
+           // We just store a mock user or decode the jwt here. 
+           // Better: Add an endpoint in backend `api.get('/auth/me')` later.
+           setUser({ email: 'user@example.com' }); // Mock for now until /me endpoint
         } catch (err) {
           console.error("Auth check failed", err);
           localStorage.removeItem('token');
@@ -30,25 +31,26 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (credentials) => {
-    // Example: const res = await api.post('/auth/login', credentials);
-    // localStorage.setItem('token', res.data.token);
-    // setUser(res.data.user);
-    if(credentials.email) {
-       localStorage.setItem('token', 'fake-jwt-token-123');
-       setUser({ email: credentials.email });
+    try {
+      const res = await api.post('/auth/login', credentials);
+      localStorage.setItem('token', res.data.token);
+      setUser(res.data.user);
+      return true; // Return success status
+    } catch (err) {
+      // Propagate error message from backend
+      throw new Error(err.response?.data?.msg || 'Login failed');
     }
-    return true; // Return success status
   };
 
   const register = async (userData) => {
-    // Example: const res = await api.post('/auth/register', userData);
-    // localStorage.setItem('token', res.data.token);
-    // setUser(res.data.user);
-    if(userData.email) {
-       localStorage.setItem('token', 'fake-jwt-token-123');
-       setUser({ email: userData.email, name: userData.name });
+    try {
+      const res = await api.post('/auth/register', userData);
+      localStorage.setItem('token', res.data.token);
+      setUser(res.data.user);
+      return true;
+    } catch (err) {
+      throw new Error(err.response?.data?.msg || 'Registration failed');
     }
-    return true;
   };
 
   const logout = () => {
