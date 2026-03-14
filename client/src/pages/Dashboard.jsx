@@ -1,48 +1,275 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Users, Activity, Clock, CheckCircle2 } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { LogOut, LayoutDashboard, User, Activity, Clock, Heart, Brain, Droplet, Pill, CalendarClock, TrendingUp } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { modelService } from '../services/api';
 
 const Dashboard = () => {
   const { user } = useAuth();
 
-  const stats = [
-    { title: 'Total Patients', value: '1,248', icon: <Users className="text-brand-400" size={24} />, trend: '+12% this month' },
-    { title: 'Active Schedules', value: '842', icon: <Activity className="text-secondary-accent" size={24} />, trend: '+5% this week' },
-    { title: 'Pending Reviews', value: '38', icon: <Clock className="text-amber-500" size={24} />, trend: 'Needs attention' },
-  ];
+  // Form State matching the ML backend payload expectations
+  const [formData, setFormData] = useState({
+    age: '',
+    sleep_duration: '',
+    heart_rate: '',
+    stress: '',
+    glucose: '',
+    cholesterol: '',
+    gender: '0', 
+    condition: '0',
+    condition_name: 'Hypertension', // Used for chronotherapy heuristic
+    drug: '0',
+    dosage: '',
+    duration: ''
+  });
 
-  const activities = [
-    { id: 1, user: 'Sarah Jenkins', action: 'Optimized dosing schedule for hypertension', time: '2 hours ago' },
-    { id: 2, user: 'Michael Chen', action: 'Uploaded new circadian baseline data', time: '4 hours ago' },
-    { id: 3, user: 'Dr. Emily Stone', action: 'Approved revised administration window', time: 'Yesterday' },
-  ];
+  const [isLoading, setIsLoading] = useState(false);
+  const [prediction, setPrediction] = useState(null);
+  const [error, setError] = useState(null);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Helper to sync numerical condition enum with its string name for chronomedicine logic
+  const handleConditionChange = (e) => {
+    const conditionValue = e.target.value;
+    const conditionNames = {
+      '0': 'Hypertension',
+      '1': 'Diabetes',
+      '2': 'Heart Disease',
+      '3': 'Insomnia',
+      '4': 'Anxiety'
+    };
+    setFormData(prev => ({
+      ...prev,
+      condition: conditionValue,
+      condition_name: conditionNames[conditionValue] || 'Generic'
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+    setPrediction(null);
+
+    try {
+      // Cast all required string fields to numbers before sending
+      const payload = {
+        age: Number(formData.age),
+        sleep_duration: Number(formData.sleep_duration),
+        heart_rate: Number(formData.heart_rate),
+        stress: Number(formData.stress),
+        glucose: Number(formData.glucose),
+        cholesterol: Number(formData.cholesterol),
+        gender: Number(formData.gender),
+        condition: Number(formData.condition),
+        condition_name: formData.condition_name,
+        drug: Number(formData.drug),
+        dosage: Number(formData.dosage),
+        duration: Number(formData.duration)
+      };
+
+      const result = await modelService.predict(payload);
+      setPrediction(result);
+      
+    } catch (err) {
+      console.error(err);
+      setError('Failed to fetch prediction. Please ensure the backend is running.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold font-outfit text-white tracking-tight">
-          Welcome back, {user?.name || 'Doctor'}
-        </h1>
-        <p className="text-text-secondary mt-1 text-lg">Here's your clinical overview for today.</p>
-      </div>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
+      {/* Navbar */}
+      <nav style={{ 
+        padding: '1rem 2rem', 
+        background: 'rgba(30, 41, 59, 0.8)', 
+        backdropFilter: 'blur(12px)',
+        borderBottom: '1px solid var(--panel-border)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        position: 'sticky',
+        top: 0,
+        zIndex: 10
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: '600', fontSize: '1.25rem' }}>
+          <LayoutDashboard color="var(--accent-color)" />
+          <span>ChronoMed AI</span>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
+            <User size={18} />
+            <span style={{ fontSize: '0.875rem' }}>{user?.name || user?.email || 'User'}</span>
+          </div>
+          <button 
+            type="button"
+            onClick={handleLogout}
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.5rem', 
+              background: 'rgba(239, 68, 68, 0.1)', 
+              color: 'var(--error-color)',
+              border: '1px solid rgba(239, 68, 68, 0.2)',
+              padding: '0.5rem 1rem',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: '500',
+              transition: 'all 0.2s'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'}
+            onMouseOut={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
+          >
+            <LogOut size={16} style={{ pointerEvents: 'none' }} /> Logout
+          </button>
+        </div>
+      </nav>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {stats.map((stat, idx) => (
-          <div key={idx} className="bg-dark border border-[rgba(255,255,255,0.08)] p-6 rounded-2xl shadow-lg hover:border-[rgba(255,255,255,0.15)] transition-all group">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-text-secondary text-sm font-medium mb-1">{stat.title}</p>
-                <h3 className="text-3xl font-bold text-white font-outfit">{stat.value}</h3>
+      {/* Main Content */}
+      <main style={{ flex: 1, padding: '3rem 2rem', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+        <div className="animate-fade-in">
+          <h1 style={{ fontSize: '2rem', fontWeight: '700', marginBottom: '0.5rem' }}>
+            Patient ML Predictor
+          </h1>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '3rem' }}>
+            Enter patient parameters to calculate predicted chronotherapeutic improvement and recommended medication time.
+          </p>
+
+          <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+            {/* Input Form Column */}
+            <form onSubmit={handleSubmit} className="glass-panel" style={{ flex: '1 1 600px', padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
+                
+                {/* Vitals & Demographics */}
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Age</label>
+                  <input required type="number" name="age" value={formData.age} onChange={handleInputChange} className="input-field" placeholder="e.g. 45" />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Gender</label>
+                  <select required name="gender" value={formData.gender} onChange={handleInputChange} className="input-field">
+                    <option value="0">Female</option>
+                    <option value="1">Male</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Sleep Duration (hrs)</label>
+                  <input required type="number" step="0.1" name="sleep_duration" value={formData.sleep_duration} onChange={handleInputChange} className="input-field" placeholder="e.g. 7.5" />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Heart Rate (bpm)</label>
+                  <input required type="number" name="heart_rate" value={formData.heart_rate} onChange={handleInputChange} className="input-field" placeholder="e.g. 72" />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Stress Level (1-10)</label>
+                  <input required type="number" min="1" max="10" name="stress" value={formData.stress} onChange={handleInputChange} className="input-field" placeholder="e.g. 3" />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Blood Glucose (mg/dL)</label>
+                  <input required type="number" name="glucose" value={formData.glucose} onChange={handleInputChange} className="input-field" placeholder="e.g. 120" />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Cholesterol (mg/dL)</label>
+                  <input required type="number" name="cholesterol" value={formData.cholesterol} onChange={handleInputChange} className="input-field" placeholder="e.g. 210" />
+                </div>
+
+                {/* Treatment Data */}
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Condition</label>
+                  <select required name="condition" value={formData.condition} onChange={handleConditionChange} className="input-field">
+                    <option value="0">Hypertension</option>
+                    <option value="1">Diabetes</option>
+                    <option value="2">Heart Disease</option>
+                    <option value="3">Insomnia</option>
+                    <option value="4">Anxiety</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Drug Code</label>
+                  <input required type="number" name="drug" value={formData.drug} onChange={handleInputChange} className="input-field" placeholder="e.g. 4 (Drug ID)" />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Dosage (mg)</label>
+                  <input required type="number" name="dosage" value={formData.dosage} onChange={handleInputChange} className="input-field" placeholder="e.g. 500" />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Duration (Days)</label>
+                  <input required type="number" name="duration" value={formData.duration} onChange={handleInputChange} className="input-field" placeholder="e.g. 30" />
+                </div>
+
               </div>
-              <div className="p-3 bg-white/5 rounded-xl border border-white/10 group-hover:scale-110 transition-transform">
-                {stat.icon}
+              
+              <div style={{ marginTop: '1rem' }}>
+                <button type="submit" disabled={isLoading} className="btn-primary" style={{ padding: '0.875rem', fontSize: '1.1rem' }}>
+                  {isLoading ? 'Processing AI Models...' : 'Calculate Prediction'}
+                </button>
               </div>
-            </div>
-            <div className="mt-4 text-sm text-text-secondary/80 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
-              {stat.trend}
+            </form>
+
+            {/* Prediction Result Column */}
+            <div style={{ flex: '1 1 350px', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              
+              {error && (
+                <div style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '12px' }}>
+                  <p className="text-error">{error}</p>
+                </div>
+              )}
+
+              <div className="glass-panel" style={{ padding: '2rem', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.1 }}>
+                  <TrendingUp size={150} />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
+                  <div style={{ padding: '0.5rem', background: 'rgba(59, 130, 246, 0.2)', borderRadius: '8px', color: 'var(--accent-color)' }}>
+                    <Activity size={24} />
+                  </div>
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>Improvement Score</h2>
+                </div>
+                <div style={{ fontSize: '3rem', fontWeight: '700', color: prediction ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                  {prediction ? prediction.predicted_improvement_score.toFixed(1) : '--'}
+                  <span style={{ fontSize: '1rem', fontWeight: '400', color: 'var(--text-secondary)', marginLeft: '0.5rem' }}>/ 10</span>
+                </div>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '1rem' }}>
+                  Score indicating expected patient treatment outcome based on Random Forest regression.
+                </p>
+              </div>
+
+              <div className="glass-panel" style={{ padding: '2rem', position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(139, 92, 246, 0.1) 100%)' }}>
+                <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.1 }}>
+                  <Clock size={150} />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
+                  <div style={{ padding: '0.5rem', background: 'rgba(139, 92, 246, 0.2)', borderRadius: '8px', color: '#a78bfa' }}>
+                    <CalendarClock size={24} />
+                  </div>
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>Chronotherapy Optimal Hour</h2>
+                </div>
+                <div style={{ fontSize: '3rem', fontWeight: '700', color: prediction ? '#a78bfa' : 'var(--text-secondary)' }}>
+                  {prediction ? `${prediction.recommended_medication_hour}:00` : '--:--'}
+                </div>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '1rem' }}>
+                  Suggested daily medication administration time ({formData.condition_name}) for maximized efficacy.
+                </p>
+              </div>
+
             </div>
           </div>
         ))}
