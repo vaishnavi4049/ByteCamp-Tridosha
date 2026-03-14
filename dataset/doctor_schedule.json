@@ -1,0 +1,32 @@
+{
+    "0": {
+        "name": "Hypertension",
+        "recommended_hour": 18,
+        "drug": "Beta Blocker",
+        "dosage_range": "25-100mg"
+    },
+    "1": {
+        "name": "Diabetes",
+        "recommended_hour": 8,
+        "drug": "Metformin",
+        "dosage_range": "500-2000mg"
+    },
+    "2": {
+        "name": "Heart Disease",
+        "recommended_hour": 20,
+        "drug": "Statin",
+        "dosage_range": "20-80mg"
+    },
+    "3": {
+        "name": "Insomnia",
+        "recommended_hour": 22,
+        "drug": "Zolpidem",
+        "dosage_range": "5-10mg"
+    },
+    "4": {
+        "name": "Anxiety",
+        "recommended_hour": 9,
+        "drug": "Sertraline",
+        "dosage_range": "50-200mg"
+    }
+}
