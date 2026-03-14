@@ -69,6 +69,7 @@ def predict():
     data = request.json
 
 
+
     try:
         features = pd.DataFrame([[
             data["age"],
@@ -101,6 +102,7 @@ def predict():
     except Exception as e:
         print("MODEL ERROR:", e)
         predicted_hour = 8
+
     features = pd.DataFrame([[
         data["age"],
         data["sleep_duration"],
@@ -127,6 +129,7 @@ def predict():
         "Treatment_Duration_days"
     ])
 
+
     ai_time = predicted_hour
 
     schedules = load_json(SCHEDULE_FILE, {})
@@ -138,6 +141,7 @@ def predict():
 
     if time_diff > 12:
         time_diff = 24 - time_diff
+
 
     verification_required = time_diff >= 2
     status = "WARNING" if verification_required else "SAFE"

@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
 
+
 :root {
   --bg-dark: #0f172a;
   --bg-panel: rgba(30, 41, 59, 0.8);
@@ -40,6 +41,7 @@
     --error-color: #ef4444;
     --success-color: #10b981;
   }
+
 
 
 body {
@@ -216,6 +218,43 @@ body {
 
 /* Premium Utilities */
 .glass-panel {
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Outfit', sans-serif;
+  }
+
+  #root {
+    display: flex;
+    flex: 1;
+    width: 100%;
+  }
+
+} /* end @layer base */
+
+/* Premium Utilities */
+.glass-panel {
+
     background: var(--panel-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -276,6 +315,7 @@ body {
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
   }
+
 
 .btn-outline-danger {
   width: 100%;
@@ -398,6 +438,7 @@ body {
   0%, 100% { opacity: 1; }
   50% { opacity: .5; }
 }
+
   .btn-secondary:hover {
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.2);
@@ -505,4 +546,8 @@ body {
     color: var(--error-color);
     font-size: 0.875rem;
     margin-top: 4px;
+
   }
+
+  }
+
