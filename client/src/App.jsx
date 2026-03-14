@@ -9,12 +9,15 @@ import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import DashboardLayout from './components/layout/DashboardLayout';
-
+import axios from 'axios';
 import './App.css';
+import { useState } from 'react';
+axios.defaults.withCredentials = true; // important for sending cookies
 
 function App() {
+   const [user, setUser] = useState(null);
   return (
-    <AuthProvider>
+   
       <Router>
         <div className="app-container">
           <Routes>
@@ -22,8 +25,8 @@ function App() {
             <Route path="/" element={<Home />} />
 
             {/* Public Auth Routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+           <Route path="/login" element={!user ? <Login setUser={setUser} /> : <Navigate to="/dashboard" />} />
+        <Route path="/register" element={!user ? <Register /> : <Navigate to="/dashboard" />} />
 
             {/* Protected Routes nested in SaaS Layout */}
             <Route path="/dashboard" element={
@@ -41,7 +44,7 @@ function App() {
           </Routes>
         </div>
       </Router>
-    </AuthProvider>
+   
   );
 }
 
