@@ -93,24 +93,24 @@ const DoctorSettings = () => {
               <div className="grid-3" style={{ gap: '1rem', marginTop: '0.5rem' }}>
                 <div className="form-group">
                   <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Clock size={16} color="var(--color-healthcare-main)"/> Recommended Hour (0-23)
+                    <Clock size={16} color="var(--color-healthcare-main)" /> Recommended Hour (0-23)
                   </label>
-                  <input 
-                    type="number" 
-                    min="0" max="23" 
-                    className="input-field" 
-                    value={data.recommended_hour ?? ''} 
+                  <input
+                    type="number"
+                    min="0" max="23"
+                    className="input-field"
+                    value={data.recommended_hour ?? ''}
                     onChange={(e) => handleChange(condition.id, 'recommended_hour', e.target.value)}
                     placeholder="e.g. 21"
                   />
                 </div>
-                
+
                 <div className="form-group">
                   <label className="form-label">Standard Drug Class</label>
-                  <input 
-                    type="text" 
-                    className="input-field" 
-                    value={data.drug || ''} 
+                  <input
+                    type="text"
+                    className="input-field"
+                    value={data.drug || ''}
                     onChange={(e) => handleChange(condition.id, 'drug', e.target.value)}
                     placeholder="e.g. ACE Inhibitor"
                   />
@@ -118,10 +118,10 @@ const DoctorSettings = () => {
 
                 <div className="form-group">
                   <label className="form-label">Typical Dosage Range</label>
-                  <input 
-                    type="text" 
-                    className="input-field" 
-                    value={data.dosage_range || ''} 
+                  <input
+                    type="text"
+                    className="input-field"
+                    value={data.dosage_range || ''}
                     onChange={(e) => handleChange(condition.id, 'dosage_range', e.target.value)}
                     placeholder="e.g. 10-40mg"
                   />
@@ -132,15 +132,15 @@ const DoctorSettings = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                   {isSuccess && <span style={{ color: 'var(--color-success)', fontSize: '0.875rem', fontWeight: '500' }}>Saved effectively!</span>}
                   {isError && <span style={{ color: 'var(--color-error)', fontSize: '0.875rem', fontWeight: '500' }}>Error connecting to server.</span>}
-                  
-                  <button 
+
+                  <button
                     onClick={() => handleSave(condition.id)}
                     disabled={isSaving}
-                    style={{ 
-                      padding: '0.5rem 1.5rem', 
-                      backgroundColor: 'var(--color-healthcare-main)', 
-                      color: 'white', 
-                      borderRadius: '0.5rem', 
+                    style={{
+                      padding: '0.5rem 1.5rem',
+                      backgroundColor: 'var(--color-healthcare-main)',
+                      color: 'white',
+                      borderRadius: '0.5rem',
                       border: 'none',
                       cursor: isSaving ? 'wait' : 'pointer',
                       display: 'flex',

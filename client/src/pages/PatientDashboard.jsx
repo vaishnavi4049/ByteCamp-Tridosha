@@ -60,7 +60,7 @@ const PatientDashboard = () => {
     e.preventDefault();
     setIsLoading(true);
     setPrediction(null);
-    
+
     // Clear old requests on new prediction
     setRequestStatus("none");
     setLatestRequest(null);
@@ -74,25 +74,25 @@ const PatientDashboard = () => {
         condition_name: formData.condition_name, drug: Number(formData.drug),
         dosage: Number(formData.dosage), duration: Number(formData.duration)
       };
-      
+
       const result = await modelService.predict(payload);
       setPrediction(result);
-      
+
       // Save history background task
       try {
-         await modelService.saveHistory({
-            userEmail: currentUserId,
-            disease_condition: formData.condition_name,
-            ai_recommended_time: result.ai_recommended_time,
-            doctor_recommended_time: result.doctor_recommended_time,
-            time_difference_hours: result.time_difference_hours,
-            predicted_improvement_score: result.predicted_improvement_score,
-            doctor_verification_required: result.doctor_verification_required,
-            status: result.status,
-            parameters: payload
-         });
+        await modelService.saveHistory({
+          userEmail: currentUserId,
+          disease_condition: formData.condition_name,
+          ai_recommended_time: result.ai_recommended_time,
+          doctor_recommended_time: result.doctor_recommended_time,
+          time_difference_hours: result.time_difference_hours,
+          predicted_improvement_score: result.predicted_improvement_score,
+          doctor_verification_required: result.doctor_verification_required,
+          status: result.status,
+          parameters: payload
+        });
       } catch (historyErr) {
-         console.error("Failed to save prediction history", historyErr);
+        console.error("Failed to save prediction history", historyErr);
       }
 
     } catch (err) {
@@ -128,21 +128,21 @@ const PatientDashboard = () => {
           <p className="page-subtitle">Enter medical parameters to generate an AI chronotherapy schedule.</p>
         </div>
       </div>
-      
+
       {/* Patient Notifications for Doctor Review */}
       {latestRequest && requestStatus !== "none" && requestStatus !== "pending" && (
         <div className="glass-panel" style={{ marginBottom: '2rem', backgroundColor: 'var(--bg-panel)', borderColor: requestStatus === 'approved' ? 'var(--color-success-border)' : 'var(--color-error-border)' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-             {requestStatus === 'approved' ? <CheckCircle size={32} color="var(--color-success)"/> : <FileText size={32} color="var(--color-error)"/>}
-             <div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: '700', color: requestStatus === 'approved' ? 'var(--color-success)' : 'var(--color-error)', marginBottom: '0.25rem' }}>
-                   {requestStatus === 'approved' ? 'Doctor Approved AI Recommendation' : 'Doctor Updated Medication Time'}
-                </h3>
-                <p style={{ color: 'var(--text-muted)' }}>
-                  Your doctor has reviewed the safety warning for <strong>{latestRequest.condition}</strong>. 
-                  The final official dosage time is set to <span style={{ fontWeight: '700', color: 'var(--text-main)' }}>{latestRequest.final_time}:00</span>.
-                </p>
-             </div>
+            {requestStatus === 'approved' ? <CheckCircle size={32} color="var(--color-success)" /> : <FileText size={32} color="var(--color-error)" />}
+            <div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: '700', color: requestStatus === 'approved' ? 'var(--color-success)' : 'var(--color-error)', marginBottom: '0.25rem' }}>
+                {requestStatus === 'approved' ? 'Doctor Approved AI Recommendation' : 'Doctor Updated Medication Time'}
+              </h3>
+              <p style={{ color: 'var(--text-muted)' }}>
+                Your doctor has reviewed the safety warning for <strong>{latestRequest.condition}</strong>.
+                The final official dosage time is set to <span style={{ fontWeight: '700', color: 'var(--text-main)' }}>{latestRequest.final_time}:00</span>.
+              </p>
+            </div>
           </div>
         </div>
       )}
@@ -210,9 +210,9 @@ const PatientDashboard = () => {
               <input required type="number" name="duration" value={formData.duration} onChange={handleInputChange} className="input-field" placeholder="30" />
             </div>
           </div>
-          
+
           <button type="submit" disabled={isLoading} className="btn-primary" style={{ marginTop: '1rem' }}>
-            {isLoading ? <span className="animate-pulse">Analyzing...</span> : <>Generate AI Medication Schedule <Activity size={18}/></>}
+            {isLoading ? <span className="animate-pulse">Analyzing...</span> : <>Generate AI Medication Schedule <Activity size={18} /></>}
           </button>
         </form>
 
@@ -232,19 +232,19 @@ const PatientDashboard = () => {
                     {prediction.doctor_verification_required ? 'AI recommendation differs from doctor guideline' : 'SAFE RECOMMENDATION'}
                   </h3>
                   <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-                    {prediction.doctor_verification_required 
-                      ? 'Doctor consultation required before beginning this schedule.' 
+                    {prediction.doctor_verification_required
+                      ? 'Doctor consultation required before beginning this schedule.'
                       : 'The predicted schedule aligns perfectly with general medical safety thresholds.'}
                   </p>
-                  
+
                   {prediction.doctor_verification_required && (
-                    <button 
+                    <button
                       onClick={handleDoctorRequest}
                       disabled={requestStatus === "pending" || requestStatus === "approved" || requestStatus === "rejected"}
                       className={(requestStatus === "pending" || requestStatus === "approved" || requestStatus === "rejected") ? "btn-success" : "btn-outline-danger"}
                       style={{ marginTop: '1rem', width: 'auto', padding: '0.5rem 1rem' }}
                     >
-                      <Send size={16} /> 
+                      <Send size={16} />
                       {requestStatus === "pending" ? 'Sent for Doctor Review' : 'Consult Doctor'}
                     </button>
                   )}
@@ -258,7 +258,7 @@ const PatientDashboard = () => {
                   <div className="metric-value">{(prediction.predicted_improvement_score).toFixed(2)}</div>
                   <div className="metric-label">AI Improvement Score</div>
                 </div>
-                
+
                 <div className="glass-panel metric-card">
                   <div className="metric-icon teal"><Clock size={24} /></div>
                   <div className="metric-value teal">{prediction.ai_recommended_time}:00</div>
@@ -277,14 +277,14 @@ const PatientDashboard = () => {
                   <div className="metric-label">Time Difference</div>
                 </div>
               </div>
-              
+
               {/* Medical Report Generation section when differing */}
               {prediction.doctor_verification_required && (
-                 <MedicalReport 
-                    prediction={prediction} 
-                    formData={formData} 
-                    patientId={currentUserId}
-                 />
+                <MedicalReport
+                  prediction={prediction}
+                  formData={formData}
+                  patientId={currentUserId}
+                />
               )}
             </>
           )}
