@@ -35,7 +35,7 @@ router.post("/login", async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 24 * 60 * 60 * 1000
     });
 
@@ -47,8 +47,34 @@ router.post("/login", async (req, res) => {
 
 // Logout
 router.post("/logout", (req, res) => {
-  res.clearCookie("token");
-  res.json({ message: "Logged out successfully" });
+  // Clear the cookie by setting it to empty and giving it an immediate expiration date
+  res.cookie("token", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    expires: new Date(0), // Expire immediately in the past
+    maxAge: 0
+  });
+
+  res.status(200).json({
+    message: "Logged out successfully"
+  });
+});
+
+// Get Current User
+router.get("/me", async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) return res.status(401).json({ message: "Unauthorized" });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select("-password");
+    if (!user) return res.status(401).json({ message: "User not found" });
+
+    res.json({ user: { name: user.name, email: user.email, role: user.role } });
+  } catch (err) {
+    res.status(401).json({ message: "Invalid token" });
+  }
 });
 
 module.exports = router;
