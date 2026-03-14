@@ -1,103 +1,73 @@
-import { useNavigate } from 'react-router-dom';
-import { LogOut, LayoutDashboard, User } from 'lucide-react';
+import React from 'react';
 import { useAuth } from '../context/AuthContext';
+import { Users, Activity, Clock, CheckCircle2 } from 'lucide-react';
 
 const Dashboard = () => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+  const stats = [
+    { title: 'Total Patients', value: '1,248', icon: <Users className="text-brand-400" size={24} />, trend: '+12% this month' },
+    { title: 'Active Schedules', value: '842', icon: <Activity className="text-secondary-accent" size={24} />, trend: '+5% this week' },
+    { title: 'Pending Reviews', value: '38', icon: <Clock className="text-amber-500" size={24} />, trend: 'Needs attention' },
+  ];
+
+  const activities = [
+    { id: 1, user: 'Sarah Jenkins', action: 'Optimized dosing schedule for hypertension', time: '2 hours ago' },
+    { id: 2, user: 'Michael Chen', action: 'Uploaded new circadian baseline data', time: '4 hours ago' },
+    { id: 3, user: 'Dr. Emily Stone', action: 'Approved revised administration window', time: 'Yesterday' },
+  ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
-      {/* Navbar */}
-      <nav style={{ 
-        padding: '1rem 2rem', 
-        background: 'rgba(30, 41, 59, 0.8)', 
-        backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid var(--panel-border)',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        position: 'sticky',
-        top: 0,
-        zIndex: 10
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: '600', fontSize: '1.25rem' }}>
-          <LayoutDashboard color="var(--accent-color)" />
-          <span>MyApp</span>
-        </div>
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
-            <User size={18} />
-            <span style={{ fontSize: '0.875rem' }}>{user?.name || user?.email || 'User'}</span>
-          </div>
-          <button 
-            type="button"
-            onClick={handleLogout}
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '0.5rem', 
-              background: 'rgba(239, 68, 68, 0.1)', 
-              color: 'var(--error-color)',
-              border: '1px solid rgba(239, 68, 68, 0.2)',
-              padding: '0.5rem 1rem',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontWeight: '500',
-              transition: 'all 0.2s'
-            }}
-            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'}
-            onMouseOut={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
-          >
-            <LogOut size={16} style={{ pointerEvents: 'none' }} /> Logout
-          </button>
-        </div>
-      </nav>
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-3xl font-bold font-outfit text-white tracking-tight">
+          Welcome back, {user?.name || 'Doctor'}
+        </h1>
+        <p className="text-text-secondary mt-1 text-lg">Here's your clinical overview for today.</p>
+      </div>
 
-      {/* Main Content */}
-      <main style={{ flex: 1, padding: '3rem 2rem', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-        <div className="animate-fade-in">
-          <h1 style={{ fontSize: '2rem', fontWeight: '700', marginBottom: '0.5rem' }}>
-            Welcome to your Dashboard
-          </h1>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '3rem' }}>
-            You have successfully authenticated multi-layer security.
-          </p>
-
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-            gap: '1.5rem' 
-          }}>
-            {[1, 2, 3].map((card) => (
-              <div key={card} className="glass-panel" style={{ padding: '2rem' }}>
-                <div style={{ 
-                  width: '40px', 
-                  height: '40px', 
-                  borderRadius: '10px', 
-                  background: 'rgba(59, 130, 246, 0.1)', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  marginBottom: '1rem'
-                }}>
-                  <div style={{ width: '20px', height: '20px', background: 'var(--accent-color)', borderRadius: '4px' }}></div>
-                </div>
-                <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>Module {card}</h3>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: '1.6' }}>
-                  This is a placeholder card to demonstrate the premium glassmorphism aesthetic of your new application dashboard.
-                </p>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {stats.map((stat, idx) => (
+          <div key={idx} className="bg-dark border border-[rgba(255,255,255,0.08)] p-6 rounded-2xl shadow-lg hover:border-[rgba(255,255,255,0.15)] transition-all group">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-text-secondary text-sm font-medium mb-1">{stat.title}</p>
+                <h3 className="text-3xl font-bold text-white font-outfit">{stat.value}</h3>
               </div>
-            ))}
+              <div className="p-3 bg-white/5 rounded-xl border border-white/10 group-hover:scale-110 transition-transform">
+                {stat.icon}
+              </div>
+            </div>
+            <div className="mt-4 text-sm text-text-secondary/80 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+              {stat.trend}
+            </div>
           </div>
+        ))}
+      </div>
+
+      {/* Recent Activity */}
+      <div className="bg-dark border border-[rgba(255,255,255,0.08)] rounded-2xl shadow-lg overflow-hidden">
+        <div className="p-6 border-b border-[rgba(255,255,255,0.05)]">
+          <h2 className="text-xl font-bold font-outfit text-white">Recent Clinical Activity</h2>
         </div>
-      </main>
+        <div className="divide-y divide-[rgba(255,255,255,0.05)]">
+          {activities.map((item) => (
+            <div key={item.id} className="p-6 flex items-start gap-4 hover:bg-white/[0.02] transition-colors">
+              <div className="mt-1 flex-shrink-0">
+                <CheckCircle2 size={20} className="text-brand-400" />
+              </div>
+              <div className="flex-1">
+                <p className="text-white font-medium">{item.user}</p>
+                <p className="text-text-secondary text-sm mt-0.5">{item.action}</p>
+              </div>
+              <span className="text-xs text-text-secondary whitespace-nowrap">{item.time}</span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

@@ -21,9 +21,9 @@ const Login = () => {
       if (!email || !password) {
         throw new Error('Please fill in all fields');
       }
-      
+
       const success = await login({ email, password });
-      if(success) {
+      if (success) {
         navigate('/dashboard');
       }
     } catch (err) {
@@ -57,10 +57,10 @@ const Login = () => {
               <div style={{ position: 'absolute', top: '50%', left: '12px', transform: 'translateY(-50%)', color: '#64748b' }}>
                 <Mail size={18} />
               </div>
-              <input 
-                type="email" 
-                className="input-field" 
-                placeholder="you@example.com" 
+              <input
+                type="email"
+                className="input-field"
+                placeholder="you@example.com"
                 style={{ paddingLeft: '2.5rem' }}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -74,10 +74,10 @@ const Login = () => {
               <div style={{ position: 'absolute', top: '50%', left: '12px', transform: 'translateY(-50%)', color: '#64748b' }}>
                 <Lock size={18} />
               </div>
-              <input 
-                type="password" 
-                className="input-field" 
-                placeholder="••••••••" 
+              <input
+                type="password"
+                className="input-field"
+                placeholder="••••••••"
                 style={{ paddingLeft: '2.5rem' }}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

@@ -28,9 +28,9 @@ const Register = () => {
       if (password.length < 6) {
         throw new Error('Password must be at least 6 characters');
       }
-      
+
       const success = await register({ name, email, password });
-      if(success) {
+      if (success) {
         navigate('/dashboard');
       }
     } catch (err) {
@@ -64,10 +64,10 @@ const Register = () => {
               <div style={{ position: 'absolute', top: '50%', left: '12px', transform: 'translateY(-50%)', color: '#64748b' }}>
                 <User size={18} />
               </div>
-              <input 
-                type="text" 
-                className="input-field" 
-                placeholder="John Doe" 
+              <input
+                type="text"
+                className="input-field"
+                placeholder="John Doe"
                 style={{ paddingLeft: '2.5rem' }}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -81,10 +81,10 @@ const Register = () => {
               <div style={{ position: 'absolute', top: '50%', left: '12px', transform: 'translateY(-50%)', color: '#64748b' }}>
                 <Mail size={18} />
               </div>
-              <input 
-                type="email" 
-                className="input-field" 
-                placeholder="you@example.com" 
+              <input
+                type="email"
+                className="input-field"
+                placeholder="you@example.com"
                 style={{ paddingLeft: '2.5rem' }}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -98,10 +98,10 @@ const Register = () => {
               <div style={{ position: 'absolute', top: '50%', left: '12px', transform: 'translateY(-50%)', color: '#64748b' }}>
                 <Lock size={18} />
               </div>
-              <input 
-                type="password" 
-                className="input-field" 
-                placeholder="••••••••" 
+              <input
+                type="password"
+                className="input-field"
+                placeholder="••••••••"
                 style={{ paddingLeft: '2.5rem' }}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -115,10 +115,10 @@ const Register = () => {
               <div style={{ position: 'absolute', top: '50%', left: '12px', transform: 'translateY(-50%)', color: '#64748b' }}>
                 <Lock size={18} />
               </div>
-              <input 
-                type="password" 
-                className="input-field" 
-                placeholder="••••••••" 
+              <input
+                type="password"
+                className="input-field"
+                placeholder="••••••••"
                 style={{ paddingLeft: '2.5rem' }}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
