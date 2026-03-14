@@ -7,6 +7,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 
 // Pages
+import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import PatientDashboard from './pages/PatientDashboard';
@@ -19,8 +20,9 @@ import UserHistory from './pages/UserHistory';
 const Home = () => <Navigate to="/dashboard" replace />;
 
 function App() {
+   const [user, setUser] = useState(null);
   return (
-    <AuthProvider>
+   
       <Router>
         <Routes>
           {/* Public Routes */}
@@ -41,7 +43,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
-    </AuthProvider>
+   
   );
 }
 
