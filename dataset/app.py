@@ -1,9 +1,11 @@
 from flask import Flask,request,jsonify
+from flask_cors import CORS
 import pickle
-import numpy as np
+import pandas as pd
 from chronotherapy import medication_time
 
 app = Flask(__name__)
+CORS(app)
 
 model = pickle.load(open("model/chronomed_model.pkl","rb"))
 
@@ -13,8 +15,7 @@ def predict():
 
     data = request.json
 
-    features = np.array([[
-
+    features = pd.DataFrame([[
         data["age"],
         data["sleep_duration"],
         data["heart_rate"],
@@ -26,8 +27,19 @@ def predict():
         data["drug"],
         data["dosage"],
         data["duration"]
-
-    ]])
+    ]], columns=[
+        "Age",
+        "Sleep Duration",
+        "Heart Rate",
+        "Stress Level",
+        "blood_glucose_level",
+        "Cholesterol",
+        "Gender",
+        "Condition",
+        "Drug_Name",
+        "Dosage_mg",
+        "Treatment_Duration_days"
+    ])
 
     improvement = model.predict(features)[0]
 
