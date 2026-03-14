@@ -1,507 +1,330 @@
-// import React from 'react';
-// import { useAuth } from '../context/AuthContext';
-// import { Users, Activity, Clock, CheckCircle2 } from 'lucide-react';
-// import { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import { LogOut, LayoutDashboard, User, Activity, Clock, Heart, Brain, Droplet, Pill, CalendarClock, TrendingUp } from 'lucide-react';
-// import { useAuth } from '../context/AuthContext';
-// import { modelService } from '../services/api';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+    Activity,
+    Clock,
+    CheckCircle2,
+    CalendarClock,
+    TrendingUp,
+    ArrowLeft
+} from "lucide-react";
 
-// const Dashboard = () => {
-//   const { user } = useAuth();
-
-//   // Form State matching the ML backend payload expectations
-//   const [formData, setFormData] = useState({
-//     age: '',
-//     sleep_duration: '',
-//     heart_rate: '',
-//     stress: '',
-//     glucose: '',
-//     cholesterol: '',
-//     gender: '0', 
-//     condition: '0',
-//     condition_name: 'Hypertension', // Used for chronotherapy heuristic
-//     drug: '0',
-//     dosage: '',
-//     duration: ''
-//   });
-
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [prediction, setPrediction] = useState(null);
-//   const [error, setError] = useState(null);
-
-//   const handleLogout = () => {
-//     logout();
-//     navigate('/login');
-//   };
-
-//   const handleInputChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormData(prev => ({
-//       ...prev,
-//       [name]: value
-//     }));
-//   };
-
-//   // Helper to sync numerical condition enum with its string name for chronomedicine logic
-//   const handleConditionChange = (e) => {
-//     const conditionValue = e.target.value;
-//     const conditionNames = {
-//       '0': 'Hypertension',
-//       '1': 'Diabetes',
-//       '2': 'Heart Disease',
-//       '3': 'Insomnia',
-//       '4': 'Anxiety'
-//     };
-//     setFormData(prev => ({
-//       ...prev,
-//       condition: conditionValue,
-//       condition_name: conditionNames[conditionValue] || 'Generic'
-//     }));
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     setIsLoading(true);
-//     setError(null);
-//     setPrediction(null);
-
-//     try {
-//       // Cast all required string fields to numbers before sending
-//       const payload = {
-//         age: Number(formData.age),
-//         sleep_duration: Number(formData.sleep_duration),
-//         heart_rate: Number(formData.heart_rate),
-//         stress: Number(formData.stress),
-//         glucose: Number(formData.glucose),
-//         cholesterol: Number(formData.cholesterol),
-//         gender: Number(formData.gender),
-//         condition: Number(formData.condition),
-//         condition_name: formData.condition_name,
-//         drug: Number(formData.drug),
-//         dosage: Number(formData.dosage),
-//         duration: Number(formData.duration)
-//       };
-
-//       const result = await modelService.predict(payload);
-//       setPrediction(result);
-      
-//     } catch (err) {
-//       console.error(err);
-//       setError('Failed to fetch prediction. Please ensure the backend is running.');
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   return (
-//     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
-//       {/* Navbar */}
-//       <nav style={{ 
-//         padding: '1rem 2rem', 
-//         background: 'rgba(30, 41, 59, 0.8)', 
-//         backdropFilter: 'blur(12px)',
-//         borderBottom: '1px solid var(--panel-border)',
-//         display: 'flex',
-//         justifyContent: 'space-between',
-//         alignItems: 'center',
-//         position: 'sticky',
-//         top: 0,
-//         zIndex: 10
-//       }}>
-//         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: '600', fontSize: '1.25rem' }}>
-//           <LayoutDashboard color="var(--accent-color)" />
-//           <span>ChronoMed AI</span>
-//         </div>
-        
-//         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-//           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
-//             <User size={18} />
-//             <span style={{ fontSize: '0.875rem' }}>{user?.name || user?.email || 'User'}</span>
-//           </div>
-//           <button 
-//             type="button"
-//             onClick={handleLogout}
-//             style={{ 
-//               display: 'flex', 
-//               alignItems: 'center', 
-//               gap: '0.5rem', 
-//               background: 'rgba(239, 68, 68, 0.1)', 
-//               color: 'var(--error-color)',
-//               border: '1px solid rgba(239, 68, 68, 0.2)',
-//               padding: '0.5rem 1rem',
-//               borderRadius: '6px',
-//               cursor: 'pointer',
-//               fontWeight: '500',
-//               transition: 'all 0.2s'
-//             }}
-//             onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'}
-//             onMouseOut={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
-//           >
-//             <LogOut size={16} style={{ pointerEvents: 'none' }} /> Logout
-//           </button>
-//         </div>
-//       </nav>
-
-//       {/* Main Content */}
-//       <main style={{ flex: 1, padding: '3rem 2rem', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-//         <div className="animate-fade-in">
-//           <h1 style={{ fontSize: '2rem', fontWeight: '700', marginBottom: '0.5rem' }}>
-//             Patient ML Predictor
-//           </h1>
-//           <p style={{ color: 'var(--text-secondary)', marginBottom: '3rem' }}>
-//             Enter patient parameters to calculate predicted chronotherapeutic improvement and recommended medication time.
-//           </p>
-
-//           <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-//             {/* Input Form Column */}
-//             <form onSubmit={handleSubmit} className="glass-panel" style={{ flex: '1 1 600px', padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-//               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
-                
-//                 {/* Vitals & Demographics */}
-//                 <div>
-//                   <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Age</label>
-//                   <input required type="number" name="age" value={formData.age} onChange={handleInputChange} className="input-field" placeholder="e.g. 45" />
-//                 </div>
-//                 <div>
-//                   <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Gender</label>
-//                   <select required name="gender" value={formData.gender} onChange={handleInputChange} className="input-field">
-//                     <option value="0">Female</option>
-//                     <option value="1">Male</option>
-//                   </select>
-//                 </div>
-//                 <div>
-//                   <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Sleep Duration (hrs)</label>
-//                   <input required type="number" step="0.1" name="sleep_duration" value={formData.sleep_duration} onChange={handleInputChange} className="input-field" placeholder="e.g. 7.5" />
-//                 </div>
-//                 <div>
-//                   <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Heart Rate (bpm)</label>
-//                   <input required type="number" name="heart_rate" value={formData.heart_rate} onChange={handleInputChange} className="input-field" placeholder="e.g. 72" />
-//                 </div>
-//                 <div>
-//                   <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Stress Level (1-10)</label>
-//                   <input required type="number" min="1" max="10" name="stress" value={formData.stress} onChange={handleInputChange} className="input-field" placeholder="e.g. 3" />
-//                 </div>
-//                 <div>
-//                   <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Blood Glucose (mg/dL)</label>
-//                   <input required type="number" name="glucose" value={formData.glucose} onChange={handleInputChange} className="input-field" placeholder="e.g. 120" />
-//                 </div>
-//                 <div>
-//                   <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Cholesterol (mg/dL)</label>
-//                   <input required type="number" name="cholesterol" value={formData.cholesterol} onChange={handleInputChange} className="input-field" placeholder="e.g. 210" />
-//                 </div>
-
-//                 {/* Treatment Data */}
-//                 <div>
-//                   <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Condition</label>
-//                   <select required name="condition" value={formData.condition} onChange={handleConditionChange} className="input-field">
-//                     <option value="0">Hypertension</option>
-//                     <option value="1">Diabetes</option>
-//                     <option value="2">Heart Disease</option>
-//                     <option value="3">Insomnia</option>
-//                     <option value="4">Anxiety</option>
-//                   </select>
-//                 </div>
-//                 <div>
-//                   <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Drug Code</label>
-//                   <input required type="number" name="drug" value={formData.drug} onChange={handleInputChange} className="input-field" placeholder="e.g. 4 (Drug ID)" />
-//                 </div>
-//                 <div>
-//                   <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Dosage (mg)</label>
-//                   <input required type="number" name="dosage" value={formData.dosage} onChange={handleInputChange} className="input-field" placeholder="e.g. 500" />
-//                 </div>
-//                 <div>
-//                   <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Duration (Days)</label>
-//                   <input required type="number" name="duration" value={formData.duration} onChange={handleInputChange} className="input-field" placeholder="e.g. 30" />
-//                 </div>
-
-//               </div>
-              
-//               <div style={{ marginTop: '1rem' }}>
-//                 <button type="submit" disabled={isLoading} className="btn-primary" style={{ padding: '0.875rem', fontSize: '1.1rem' }}>
-//                   {isLoading ? 'Processing AI Models...' : 'Calculate Prediction'}
-//                 </button>
-//               </div>
-//             </form>
-
-//             {/* Prediction Result Column */}
-//             <div style={{ flex: '1 1 350px', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              
-//               {error && (
-//                 <div style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '12px' }}>
-//                   <p className="text-error">{error}</p>
-//                 </div>
-//               )}
-
-//               <div className="glass-panel" style={{ padding: '2rem', position: 'relative', overflow: 'hidden' }}>
-//                 <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.1 }}>
-//                   <TrendingUp size={150} />
-//                 </div>
-//                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
-//                   <div style={{ padding: '0.5rem', background: 'rgba(59, 130, 246, 0.2)', borderRadius: '8px', color: 'var(--accent-color)' }}>
-//                     <Activity size={24} />
-//                   </div>
-//                   <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>Improvement Score</h2>
-//                 </div>
-//                 <div style={{ fontSize: '3rem', fontWeight: '700', color: prediction ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
-//                   {prediction ? prediction.predicted_improvement_score.toFixed(1) : '--'}
-//                   <span style={{ fontSize: '1rem', fontWeight: '400', color: 'var(--text-secondary)', marginLeft: '0.5rem' }}>/ 10</span>
-//                 </div>
-//                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '1rem' }}>
-//                   Score indicating expected patient treatment outcome based on Random Forest regression.
-//                 </p>
-//               </div>
-
-//               <div className="glass-panel" style={{ padding: '2rem', position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(139, 92, 246, 0.1) 100%)' }}>
-//                 <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.1 }}>
-//                   <Clock size={150} />
-//                 </div>
-//                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
-//                   <div style={{ padding: '0.5rem', background: 'rgba(139, 92, 246, 0.2)', borderRadius: '8px', color: '#a78bfa' }}>
-//                     <CalendarClock size={24} />
-//                   </div>
-//                   <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>Chronotherapy Optimal Hour</h2>
-//                 </div>
-//                 <div style={{ fontSize: '3rem', fontWeight: '700', color: prediction ? '#a78bfa' : 'var(--text-secondary)' }}>
-//                   {prediction ? `${prediction.recommended_medication_hour}:00` : '--:--'}
-//                 </div>
-//                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '1rem' }}>
-//                   Suggested daily medication administration time ({formData.condition_name}) for maximized efficacy.
-//                 </p>
-//               </div>
-
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-
-//       {/* Recent Activity */}
-//       <div className="bg-dark border border-[rgba(255,255,255,0.08)] rounded-2xl shadow-lg overflow-hidden">
-//         <div className="p-6 border-b border-[rgba(255,255,255,0.05)]">
-//           <h2 className="text-xl font-bold font-outfit text-white">Recent Clinical Activity</h2>
-//         </div>
-//         <div className="divide-y divide-[rgba(255,255,255,0.05)]">
-//           {activities.map((item) => (
-//             <div key={item.id} className="p-6 flex items-start gap-4 hover:bg-white/[0.02] transition-colors">
-//               <div className="mt-1 flex-shrink-0">
-//                 <CheckCircle2 size={20} className="text-brand-400" />
-//               </div>
-//               <div className="flex-1">
-//                 <p className="text-white font-medium">{item.user}</p>
-//                 <p className="text-text-secondary text-sm mt-0.5">{item.action}</p>
-//               </div>
-//               <span className="text-xs text-text-secondary whitespace-nowrap">{item.time}</span>
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Dashboard;
-
-
-import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { 
-  Users, Activity, Clock, CheckCircle2, LogOut, LayoutDashboard, User, 
-  Heart, Brain, Droplet, Pill, CalendarClock, TrendingUp 
-} from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { modelService } from '../services/api';
+import { modelService } from "../services/api";
 
 const Dashboard = () => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
 
-  // Form State
-  const [formData, setFormData] = useState({
-    age: '', sleep_duration: '', heart_rate: '', stress: '', glucose: '', cholesterol: '',
-    gender: '0', condition: '0', condition_name: 'Hypertension', drug: '0', dosage: '', duration: ''
-  });
+    const navigate = useNavigate();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [prediction, setPrediction] = useState(null);
-  const [error, setError] = useState(null);
+    const [formData, setFormData] = useState({
+        age: "",
+        sleep_duration: "",
+        heart_rate: "",
+        stress: "",
+        glucose: "",
+        cholesterol: "",
+        gender: "0",
+        condition: "0",
+        condition_name: "Hypertension",
+        drug: "0",
+        dosage: "",
+        duration: ""
+    });
 
-  // Sample recent activities placeholder
-  const [activities] = useState([
-    { id: 1, user: 'John Doe', action: 'Checked Blood Pressure', time: '2h ago' },
-    { id: 2, user: 'Jane Smith', action: 'Updated Medication', time: '5h ago' }
-  ]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [prediction, setPrediction] = useState(null);
+    const [error, setError] = useState(null);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+    const [activities] = useState([
+        { id: 1, user: "John Doe", action: "Checked Blood Pressure", time: "2h ago" },
+        { id: 2, user: "Jane Smith", action: "Updated Medication", time: "5h ago" }
+    ]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleConditionChange = (e) => {
-    const conditionValue = e.target.value;
-    const conditionNames = {
-      '0': 'Hypertension', '1': 'Diabetes', '2': 'Heart Disease', '3': 'Insomnia', '4': 'Anxiety'
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
-    setFormData(prev => ({
-      ...prev,
-      condition: conditionValue,
-      condition_name: conditionNames[conditionValue] || 'Generic'
-    }));
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true); setError(null); setPrediction(null);
+    const handleConditionChange = (e) => {
+        const conditionValue = e.target.value;
 
-    try {
-      const payload = {
-        age: Number(formData.age),
-        sleep_duration: Number(formData.sleep_duration),
-        heart_rate: Number(formData.heart_rate),
-        stress: Number(formData.stress),
-        glucose: Number(formData.glucose),
-        cholesterol: Number(formData.cholesterol),
-        gender: Number(formData.gender),
-        condition: Number(formData.condition),
-        condition_name: formData.condition_name,
-        drug: Number(formData.drug),
-        dosage: Number(formData.dosage),
-        duration: Number(formData.duration)
-      };
+        const conditionNames = {
+            0: "Hypertension",
+            1: "Diabetes",
+            2: "Heart Disease",
+            3: "Insomnia",
+            4: "Anxiety"
+        };
 
-      const result = await modelService.predict(payload);
-      setPrediction(result);
-    } catch (err) {
-      console.error(err);
-      setError('Failed to fetch prediction. Please ensure the backend is running.');
-    } finally { setIsLoading(false); }
-  };
+        setFormData((prev) => ({
+            ...prev,
+            condition: conditionValue,
+            condition_name: conditionNames[conditionValue]
+        }));
+    };
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
-      {/* Navbar */}
-      <nav style={{ 
-        padding: '1rem 2rem', background: 'rgba(30,41,59,0.8)', backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid var(--panel-border)', display: 'flex', justifyContent: 'space-between',
-        alignItems: 'center', position: 'sticky', top: 0, zIndex: 10
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: 600, fontSize: '1.25rem' }}>
-          <LayoutDashboard color="var(--accent-color)" />
-          <span>ChronoMed AI</span>
-        </div>
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
-            <User size={18} />
-            <span style={{ fontSize: '0.875rem' }}>{user?.name || user?.email || 'User'}</span>
-          </div>
-          <button 
-            type="button" onClick={handleLogout}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(239,68,68,0.1)',
-              color: 'var(--error-color)', border: '1px solid rgba(239,68,68,0.2)', padding: '0.5rem 1rem',
-              borderRadius: '6px', cursor: 'pointer', fontWeight: 500
+        setIsLoading(true);
+        setError(null);
+        setPrediction(null);
+
+        try {
+            const payload = {
+                age: Number(formData.age),
+                sleep_duration: Number(formData.sleep_duration),
+                heart_rate: Number(formData.heart_rate),
+                stress: Number(formData.stress),
+                glucose: Number(formData.glucose),
+                cholesterol: Number(formData.cholesterol),
+                gender: Number(formData.gender),
+                condition: Number(formData.condition),
+                condition_name: formData.condition_name,
+                drug: Number(formData.drug),
+                dosage: Number(formData.dosage),
+                duration: Number(formData.duration)
+            };
+
+            const result = await modelService.predict(payload);
+
+            setPrediction(result);
+
+        } catch (err) {
+            console.error(err);
+            setError("Backend connection failed.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <div
+            style={{
+                maxWidth: "1200px",
+                margin: "40px auto",
+                padding: "0 20px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "32px"
             }}
-            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239,68,68,0.2)'}
-            onMouseOut={(e) => e.currentTarget.style.background = 'rgba(239,68,68,0.1)'}
-          >
-            <LogOut size={16} style={{ pointerEvents: 'none' }} /> Logout
-          </button>
+        >
+
+            {/* Header */}
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    borderBottom: "1px solid rgba(255,255,255,0.06)",
+                    paddingBottom: "14px"
+                }}
+            >
+
+                <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+
+                    <button
+                        onClick={() => navigate("/")}
+                        style={{
+                            background: "transparent",
+                            border: "none",
+                            cursor: "pointer",
+                            color: "white"
+                        }}
+                    >
+                        <ArrowLeft size={22} />
+                    </button>
+
+                    <div>
+                        <h1 style={{ fontSize: "28px", fontWeight: "700" }}>
+                            Patient ML Predictor
+                        </h1>
+
+                        <p style={{ color: "var(--text-secondary)", fontSize: "14px" }}>
+                            Calculate chronotherapeutic medication timing
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {/* Main Section */}
+            <div
+                style={{
+                    display: "grid",
+                    gridTemplateColumns: "2fr 1fr",
+                    gap: "24px"
+                }}
+            >
+
+                {/* Form */}
+                <form
+                    onSubmit={handleSubmit}
+                    className="glass-panel"
+                    style={{
+                        padding: "28px",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "20px"
+                    }}
+                >
+
+                    <div
+                        style={{
+                            display: "grid",
+                            gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))",
+                            gap: "18px"
+                        }}
+                    >
+
+                        <Input label="Age" name="age" value={formData.age} onChange={handleInputChange} />
+                        <Input label="Sleep Duration" name="sleep_duration" value={formData.sleep_duration} onChange={handleInputChange} />
+                        <Input label="Heart Rate" name="heart_rate" value={formData.heart_rate} onChange={handleInputChange} />
+                        <Input label="Stress Level" name="stress" value={formData.stress} onChange={handleInputChange} />
+                        <Input label="Blood Glucose" name="glucose" value={formData.glucose} onChange={handleInputChange} />
+                        <Input label="Cholesterol" name="cholesterol" value={formData.cholesterol} onChange={handleInputChange} />
+                        <Input label="Drug Code" name="drug" value={formData.drug} onChange={handleInputChange} />
+                        <Input label="Dosage (mg)" name="dosage" value={formData.dosage} onChange={handleInputChange} />
+                        <Input label="Duration (Days)" name="duration" value={formData.duration} onChange={handleInputChange} />
+
+                        <div>
+                            <label className="text-sm text-text-secondary">Condition</label>
+                            <select
+                                name="condition"
+                                value={formData.condition}
+                                onChange={handleConditionChange}
+                                className="input-field"
+                            >
+                                <option value="0">Hypertension</option>
+                                <option value="1">Diabetes</option>
+                                <option value="2">Heart Disease</option>
+                                <option value="3">Insomnia</option>
+                                <option value="4">Anxiety</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="btn-primary"
+                        style={{ padding: "12px" }}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? "Processing..." : "Calculate Prediction"}
+                    </button>
+
+                </form>
+
+
+                {/* Prediction Panel */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+
+                    {error && (
+                        <div style={{ padding: "14px", background: "rgba(239,68,68,0.1)" }}>
+                            {error}
+                        </div>
+                    )}
+
+                    {/* Score */}
+                    <PredictionCard
+                        icon={<Activity />}
+                        title="Improvement Score"
+                        value={
+                            prediction
+                                ? prediction.predicted_improvement_score.toFixed(1)
+                                : "--"
+                        }
+                        unit="/10"
+                    />
+
+                    {/* Medication Time */}
+                    <PredictionCard
+                        icon={<CalendarClock />}
+                        title="Optimal Medication Time"
+                        value={
+                            prediction
+                                ? `${prediction.recommended_medication_hour}:00`
+                                : "--:--"
+                        }
+                    />
+
+                </div>
+
+            </div>
+
+
+            {/* Recent Activity */}
+            <div className="glass-panel" style={{ padding: "24px" }}>
+
+                <h2 style={{ marginBottom: "16px" }}>Recent Clinical Activity</h2>
+
+                {activities.map((item) => (
+                    <div
+                        key={item.id}
+                        style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            padding: "12px 0",
+                            borderBottom: "1px solid rgba(255,255,255,0.05)"
+                        }}
+                    >
+
+                        <div style={{ display: "flex", gap: "10px" }}>
+                            <CheckCircle2 size={18} />
+                            <div>
+                                <div style={{ fontWeight: "500" }}>{item.user}</div>
+                                <div style={{ fontSize: "13px", color: "var(--text-secondary)" }}>
+                                    {item.action}
+                                </div>
+                            </div>
+                        </div>
+
+                        <span style={{ fontSize: "12px", color: "var(--text-secondary)" }}>
+                            {item.time}
+                        </span>
+
+                    </div>
+                ))}
+
+            </div>
+
         </div>
-      </nav>
-
-      {/* Main Content */}
-      <main style={{ flex: 1, padding: '3rem 2rem', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: '700', marginBottom: '0.5rem' }}>Patient ML Predictor</h1>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '3rem' }}>
-          Enter patient parameters to calculate predicted chronotherapeutic improvement and recommended medication time.
-        </p>
-
-        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-          {/* Input Form Column */}
-          <form onSubmit={handleSubmit} className="glass-panel" style={{ flex: '1 1 600px', padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
-              {/* Inputs like age, gender, vitals, condition, drug, dosage, duration */}
-              {/* Keep your existing input structure here */}
-            </div>
-            <div style={{ marginTop: '1rem' }}>
-              <button type="submit" disabled={isLoading} className="btn-primary" style={{ padding: '0.875rem', fontSize: '1.1rem' }}>
-                {isLoading ? 'Processing AI Models...' : 'Calculate Prediction'}
-              </button>
-            </div>
-          </form>
-
-          {/* Prediction Column */}
-          <div style={{ flex: '1 1 350px', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {error && <div style={{ padding: '1rem', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '12px' }}>
-              <p className="text-error">{error}</p>
-            </div>}
-
-            <div className="glass-panel" style={{ padding: '2rem', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.1 }}>
-                <TrendingUp size={150} />
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
-                <div style={{ padding: '0.5rem', background: 'rgba(59,130,246,0.2)', borderRadius: '8px', color: 'var(--accent-color)' }}>
-                  <Activity size={24} />
-                </div>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>Improvement Score</h2>
-              </div>
-              <div style={{ fontSize: '3rem', fontWeight: '700', color: prediction ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
-                {prediction ? prediction.predicted_improvement_score.toFixed(1) : '--'}
-                <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--text-secondary)', marginLeft: '0.5rem' }}>/ 10</span>
-              </div>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '1rem' }}>
-                Score indicating expected patient treatment outcome based on Random Forest regression.
-              </p>
-            </div>
-
-            <div className="glass-panel" style={{ padding: '2rem', position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, rgba(30,41,59,0.7) 0%, rgba(139,92,246,0.1) 100%)' }}>
-              <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.1 }}>
-                <Clock size={150} />
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
-                <div style={{ padding: '0.5rem', background: 'rgba(139,92,246,0.2)', borderRadius: '8px', color: '#a78bfa' }}>
-                  <CalendarClock size={24} />
-                </div>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>Chronotherapy Optimal Hour</h2>
-              </div>
-              <div style={{ fontSize: '3rem', fontWeight: '700', color: prediction ? '#a78bfa' : 'var(--text-secondary)' }}>
-                {prediction ? `${prediction.recommended_medication_hour}:00` : '--:--'}
-              </div>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '1rem' }}>
-                Suggested daily medication administration time ({formData.condition_name}) for maximized efficacy.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Recent Activity */}
-        <div className="bg-dark border border-[rgba(255,255,255,0.08)] rounded-2xl shadow-lg overflow-hidden" style={{ marginTop: '2rem' }}>
-          <div className="p-6 border-b border-[rgba(255,255,255,0.05)]">
-            <h2 className="text-xl font-bold font-outfit text-white">Recent Clinical Activity</h2>
-          </div>
-          <div className="divide-y divide-[rgba(255,255,255,0.05)]">
-            {activities.map((item) => (
-              <div key={item.id} className="p-6 flex items-start gap-4 hover:bg-white/[0.02] transition-colors">
-                <div className="mt-1 flex-shrink-0">
-                  <CheckCircle2 size={20} className="text-brand-400" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-white font-medium">{item.user}</p>
-                  <p className="text-text-secondary text-sm mt-0.5">{item.action}</p>
-                </div>
-                <span className="text-xs text-text-secondary whitespace-nowrap">{item.time}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </main>
-    </div>
-  );
+    );
 };
+
+
+/* Reusable Components */
+
+const Input = ({ label, name, value, onChange }) => (
+    <div>
+        <label className="text-sm text-text-secondary">{label}</label>
+        <input
+            required
+            type="number"
+            name={name}
+            value={value}
+            onChange={onChange}
+            className="input-field"
+        />
+    </div>
+);
+
+
+const PredictionCard = ({ icon, title, value, unit }) => (
+    <div className="glass-panel" style={{ padding: "24px" }}>
+
+        <div style={{ display: "flex", gap: "10px", marginBottom: "12px" }}>
+            {icon}
+            <strong>{title}</strong>
+        </div>
+
+        <div style={{ fontSize: "36px", fontWeight: "700" }}>
+            {value} <span style={{ fontSize: "14px" }}>{unit}</span>
+        </div>
+
+    </div>
+);
 
 export default Dashboard;

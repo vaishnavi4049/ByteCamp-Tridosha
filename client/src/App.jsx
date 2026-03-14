@@ -1,90 +1,92 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import DoctorDashboard from "./pages/Doctordashboard";
 
-// Layout & Navigation
-import Layout from './components/Layout';
+function AppRoutes() {
 
-// Pages
-import Login from './pages/Login';
-import Register from './pages/Register';
-import PatientDashboard from './pages/PatientDashboard';
-import AIInsights from './pages/AIInsights';
-import DoctorDashboard from './pages/DoctorDashboard';
-import DoctorSettings from './pages/DoctorSettings';
-import UserHistory from './pages/UserHistory';
+  const { user, loading } = useAuth();
 
-// Mock Home
-const Home = () => <Navigate to="/dashboard" replace />;
+  // Show loading while auth is checking
+  if (loading) {
+    return (
+      <div style={{ color: "white", textAlign: "center", marginTop: "100px" }}>
+        Loading...
+      </div>
+    );
+  }
 
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import Profile from './pages/Profile';
-import Settings from './pages/Settings';
-import DashboardLayout from './components/layout/DashboardLayout';
-import axios from 'axios';
-import './App.css';
-import { useState } from 'react';
-axios.defaults.withCredentials = true; // important for sending cookies
-
-
-function App() {
-   const [user, setUser] = useState(null);
   return (
-   
-      <Router>
+    <Routes>
 
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          
-          {/* Protected Routes inside Layout */}
-          <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-            <Route path="/" element={<Home />} />
-            <Route path="/dashboard" element={<PatientDashboard />} />
-            <Route path="/insights" element={<AIInsights />} />
-            <Route path="/history" element={<UserHistory />} />
-            <Route path="/doctor" element={<DoctorDashboard />} />
-            <Route path="/doctor/settings" element={<DoctorSettings />} />
-          </Route>
+      {/* Home Page */}
+      <Route path="/" element={<Home />} />
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+      {/* Login */}
+      <Route
+        path="/login"
+        element={
+          !user
+            ? <Login />
+            : (
+              <Navigate
+                to={user.role === "doctor" ? "/doctor-dashboard" : "/dashboard"}
+                replace
+              />
+            )
+        }
+      />
 
-        <div className="app-container">
-          <Routes>
-            {/* Public Landing Page */}
-            <Route path="/" element={<Home />} />
+      {/* Register */}
+      <Route
+        path="/register"
+        element={
+          !user
+            ? <Register />
+            : <Navigate to="/dashboard" replace />
+        }
+      />
 
-            {/* Public Auth Routes */}
-           <Route path="/login" element={!user ? <Login setUser={setUser} /> : <Navigate to="/dashboard" />} />
-        <Route path="/register" element={!user ? <Register /> : <Navigate to="/dashboard" />} />
+      {/* User Dashboard */}
+      <Route
+        path="/dashboard"
+        element={
+          user?.role === "user"
+            ? <Dashboard />
+            : <Navigate to="/login" replace />
+        }
+      />
 
-            {/* Protected Routes nested in SaaS Layout */}
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <DashboardLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<Dashboard />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="settings" element={<Settings />} />
-            </Route>
+      {/* Doctor Dashboard */}
+      <Route
+        path="/doctor-dashboard"
+        element={
+          user?.role === "doctor"
+            ? <DoctorDashboard />
+            : <Navigate to="/login" replace />
+        }
+      />
 
-            {/* Catch-all route */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </div>
-
-      </Router>
-   
+    </Routes>
   );
 }
 
-export default App;
+export default function App() {
+
+  return (
+    <AuthProvider>
+
+      <Router>
+
+        <AppRoutes />
+
+      </Router>
+
+    </AuthProvider>
+  );
+
+}
