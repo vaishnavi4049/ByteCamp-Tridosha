@@ -1,303 +1,206 @@
-import React from "react";
-import {
-    Users,
-    Calendar,
-    FileWarning,
-    Brain,
-    PlusCircle,
-    ClipboardList,
-    ArrowLeft
-} from "lucide-react";
-
+import React, { useState, useEffect } from "react";
+import { Users, Calendar, FileWarning, Settings, ClipboardList, ArrowRight, Activity, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { modelService } from "../services/api";
 
 const DoctorDashboard = () => {
-
     const navigate = useNavigate();
+    const [stats, setStats] = useState({ pendingRequests: 0, loading: true });
 
-    const appointments = [
-        { patient: "John Doe", time: "10:00 AM", status: "Upcoming" },
-        { patient: "Sarah Smith", time: "11:30 AM", status: "Upcoming" },
-        { patient: "Michael Brown", time: "2:00 PM", status: "Completed" }
-    ];
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const requests = await modelService.getDoctorRequests();
+                const pendingCount = requests.filter(r => r.status === "pending").length;
+                setStats({ pendingRequests: pendingCount, loading: false });
+            } catch (err) {
+                console.error("Failed to fetch dashboard stats", err);
+                setStats(prev => ({ ...prev, loading: false }));
+            }
+        };
+        fetchStats();
+    }, []);
 
     return (
-        <div
-            style={{
-                maxWidth: "1200px",
-                margin: "40px auto",
-                padding: "0 20px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "32px"
-            }}
-        >
+        <div style={{ maxWidth: "1200px", margin: "40px auto", padding: "0 20px", display: "flex", flexDirection: "column", gap: "32px" }}>
+            
+            {/* Header Area */}
+            <div style={{ paddingBottom: "24px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+                <div>
+                    <div style={{ display: 'inline-block', padding: '6px 16px', background: 'rgba(59, 130, 246, 0.1)', color: '#60a5fa', borderRadius: '20px', fontSize: '13px', fontWeight: '600', marginBottom: '16px', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+                        Doctor Portal Active
+                    </div>
+                    <h1 style={{ fontSize: "36px", fontWeight: "700", color: "white", marginBottom: "8px", letterSpacing: "-0.5px" }}>
+                        Good Morning, <span style={{ color: "var(--color-healthcare-main)" }}>Doctor</span>
+                    </h1>
+                    <p style={{ color: "var(--text-secondary)", fontSize: "16px", maxWidth: "600px" }}>
+                        Welcome to your ChronoCare command center. Access settings, review AI alignments, and manage patient care.
+                    </p>
+                </div>
+                <div style={{ textAlign: "right", color: "var(--text-secondary)", fontSize: "14px", fontWeight: "500" }}>
+                    {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                </div>
+            </div>
 
-            {/* Header */}
-            <div
-                style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                    paddingBottom: "12px",
-                    borderBottom: "1px solid rgba(255,255,255,0.06)"
-                }}
-            >
+            {/* Quick Metrics */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: "20px" }}>
+                <MetricCard icon={<Users size={24} />} title="Total Patients Under Care" value="120" trend="+12% this month" trendUp={true} color="#3b82f6" />
+                <MetricCard icon={<Calendar size={24} />} title="Appointments Today" value="8" trend="3 upcoming" trendUp={null} color="#10b981" />
+                <MetricCard 
+                    icon={<FileWarning size={24} color={stats.pendingRequests > 0 ? "#f59e0b" : "#10b981"} />} 
+                    title="Pending AI Approvals" 
+                    value={stats.loading ? "..." : stats.pendingRequests} 
+                    trend={stats.pendingRequests > 0 ? "Requires your attention" : "All caught up!"}
+                    trendUp={stats.pendingRequests === 0}
+                    color={stats.pendingRequests > 0 ? "#f59e0b" : "#10b981"}
+                    highlight={stats.pendingRequests > 0}
+                />
+            </div>
 
-                {/* Left Side */}
-                <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-
-                    {/* Back Arrow */}
-                    <button
-                        onClick={() => navigate("/")}
-                        style={{
-                            background: "transparent",
-                            border: "none",
-                            cursor: "pointer",
-                            color: "white"
-                        }}
-                    >
-                        <ArrowLeft size={22} />
-                    </button>
-
+            {/* Main Navigation Cards */}
+            <h2 style={{ fontSize: "22px", fontWeight: "600", color: "white", marginTop: "16px", marginBottom: "-8px" }}>Portal Access</h2>
+            
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(400px,1fr))", gap: "24px" }}>
+                
+                {/* Pending Requests Card */}
+                <div 
+                    onClick={() => navigate("/doctor-requests")}
+                    className="glass-panel" 
+                    style={{ 
+                        padding: "32px", 
+                        cursor: "pointer", 
+                        transition: "all 0.3s ease",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "20px",
+                        position: "relative",
+                        overflow: "hidden"
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = "translateY(-4px)";
+                        e.currentTarget.style.border = "1px solid var(--color-healthcare-main)";
+                        e.currentTarget.style.boxShadow = "0 20px 40px rgba(0,0,0,0.4)";
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.border = "1px solid rgba(255,255,255,0.08)";
+                        e.currentTarget.style.boxShadow = "none";
+                    }}
+                >
+                    <div style={{ position: "absolute", top: "-20px", right: "-20px", opacity: 0.05, transform: "rotate(15deg)" }}>
+                        <ClipboardList size={180} />
+                    </div>
+                    
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "56px", height: "56px", borderRadius: "16px", background: "rgba(59, 130, 246, 0.15)", color: "#60a5fa" }}>
+                        <ClipboardList size={28} />
+                    </div>
+                    
                     <div>
-                        <h1 style={{ fontSize: "30px", fontWeight: "700", color: "white" }}>
-                            Good Morning, Doctor
-                        </h1>
-
-                        <p style={{ color: "var(--text-secondary)", fontSize: "14px" }}>
-                            Here's your clinical overview for today
+                        <h3 style={{ fontSize: "24px", fontWeight: "700", color: "white", marginBottom: "8px", display: "flex", alignItems: "center", gap: "12px" }}>
+                            AI Alignments & Overrides
+                            {stats.pendingRequests > 0 && (
+                                <span style={{ background: "#ef4444", color: "white", fontSize: "12px", padding: "4px 10px", borderRadius: "12px", fontWeight: "600" }}>
+                                    {stats.pendingRequests} New
+                                </span>
+                            )}
+                        </h3>
+                        <p style={{ color: "var(--text-secondary)", fontSize: "15px", lineHeight: "1.6" }}>
+                            Review prediction models generated by the AI that deviate from standard medical guidelines. Provide your expert approval or override recommended timings.
                         </p>
                     </div>
 
+                    <div style={{ marginTop: "auto", display: "flex", alignItems: "center", color: "var(--color-healthcare-main)", fontWeight: "600", fontSize: "15px", gap: "8px" }}>
+                        Review Pending Models <ArrowRight size={18} />
+                    </div>
                 </div>
 
-                {/* Date */}
-                <div style={{ color: "var(--text-secondary)", fontSize: "14px" }}>
-                    {new Date().toDateString()}
-                </div>
-
-            </div>
-
-
-            {/* Analytics Cards */}
-            <div
-                style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))",
-                    gap: "20px"
-                }}
-            >
-
-                <DashboardCard
-                    icon={<Users size={22} />}
-                    title="Total Patients"
-                    value="120"
-                />
-
-                <DashboardCard
-                    icon={<Calendar size={22} />}
-                    title="Appointments Today"
-                    value="8"
-                />
-
-                <DashboardCard
-                    icon={<FileWarning size={22} />}
-                    title="Pending Reports"
-                    value="3"
-                />
-
-            </div>
-
-
-            {/* Main Section */}
-            <div
-                style={{
-                    display: "grid",
-                    gridTemplateColumns: "2fr 1fr",
-                    gap: "24px"
-                }}
-            >
-
-                {/* Appointments */}
-                <div className="glass-panel" style={{ padding: "24px" }}>
-
-                    <h2
-                        style={{
-                            fontSize: "18px",
-                            marginBottom: "18px",
-                            color: "white"
-                        }}
-                    >
-                        Recent Appointments
-                    </h2>
-
-                    <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-
-                        {appointments.map((appt, index) => (
-                            <div
-                                key={index}
-                                style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                    padding: "14px 0",
-                                    borderBottom: "1px solid rgba(255,255,255,0.05)"
-                                }}
-                            >
-
-                                <div>
-                                    <div style={{ color: "white", fontWeight: "500" }}>
-                                        {appt.patient}
-                                    </div>
-
-                                    <div style={{ fontSize: "13px", color: "var(--text-secondary)" }}>
-                                        Appointment
-                                    </div>
-                                </div>
-
-                                <div style={{ textAlign: "right" }}>
-                                    <div style={{ color: "white", marginBottom: "4px" }}>
-                                        {appt.time}
-                                    </div>
-
-                                    <StatusBadge status={appt.status} />
-                                </div>
-
-                            </div>
-                        ))}
-
+                {/* Settings Card */}
+                <div 
+                    onClick={() => navigate("/doctor-settings")}
+                    className="glass-panel" 
+                    style={{ 
+                        padding: "32px", 
+                        cursor: "pointer", 
+                        transition: "all 0.3s ease",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "20px",
+                        position: "relative",
+                        overflow: "hidden"
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = "translateY(-4px)";
+                        e.currentTarget.style.border = "1px solid var(--color-healthcare-main)";
+                        e.currentTarget.style.boxShadow = "0 20px 40px rgba(0,0,0,0.4)";
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.border = "1px solid rgba(255,255,255,0.08)";
+                        e.currentTarget.style.boxShadow = "none";
+                    }}
+                >
+                    <div style={{ position: "absolute", top: "-20px", right: "-20px", opacity: 0.05, transform: "rotate(-15deg)" }}>
+                        <Settings size={180} />
                     </div>
 
-                </div>
-
-
-                {/* AI Insights */}
-                <div className="glass-panel" style={{ padding: "22px" }}>
-
-                    <div
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "8px",
-                            marginBottom: "16px"
-                        }}
-                    >
-                        <Brain size={18} color="#10b981" />
-                        <strong style={{ color: "white" }}>AI Insights</strong>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "56px", height: "56px", borderRadius: "16px", background: "rgba(16, 185, 129, 0.15)", color: "#34d399" }}>
+                        <Settings size={28} />
+                    </div>
+                    
+                    <div>
+                        <h3 style={{ fontSize: "24px", fontWeight: "700", color: "white", marginBottom: "8px" }}>
+                            Doctor Guidelines Setup
+                        </h3>
+                        <p style={{ color: "var(--text-secondary)", fontSize: "15px", lineHeight: "1.6" }}>
+                            Configure standard baseline medication algorithms for different conditions. These base rules are used by the AI to detect when a personalized timing deviates significantly.
+                        </p>
                     </div>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-
-                        <InsightCard text="Patient John Doe may experience BP spike at 6 AM." />
-
-                        <InsightCard text="Optimal statin intake window detected: 9 PM." />
-
-                        <InsightCard text="2 patients missed medication logs today." />
-
+                    <div style={{ marginTop: "auto", display: "flex", alignItems: "center", color: "var(--color-healthcare-main)", fontWeight: "600", fontSize: "15px", gap: "8px" }}>
+                        Configure Guidelines <ArrowRight size={18} />
                     </div>
-
                 </div>
 
             </div>
-
-
-            {/* Quick Actions */}
-            <div
-                style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "14px"
-                }}
-            >
-
-                <ActionButton icon={<PlusCircle size={18} />} text="Add Prescription" />
-
-                <ActionButton icon={<ClipboardList size={18} />} text="View Patients" />
-
-                <ActionButton icon={<Calendar size={18} />} text="Schedule Appointment" />
-
-            </div>
-
         </div>
     );
 };
 
-
-
-/* COMPONENTS */
-
-const DashboardCard = ({ icon, title, value }) => (
-    <div className="glass-panel" style={{ padding: "22px" }}>
-        <div
-            style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                marginBottom: "8px",
-                color: "var(--accent-color)"
-            }}
-        >
-            {icon}
-            <span style={{ fontSize: "14px" }}>{title}</span>
+// Components
+const MetricCard = ({ icon, title, value, trend, trendUp, color, highlight }) => (
+    <div className="glass-panel" style={{ 
+        padding: "24px", 
+        borderLeft: highlight ? `4px solid ${color}` : "none",
+        position: "relative",
+        overflow: "hidden"
+    }}>
+        {highlight && (
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: `${color}`, opacity: 0.03, pointerEvents: "none" }} />
+        )}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "16px" }}>
+            <div style={{ color: color, background: `${color}15`, padding: "10px", borderRadius: "12px" }}>
+                {icon}
+            </div>
+            {trend && (
+                <div style={{ 
+                    display: "flex", alignItems: "center", gap: "4px", fontSize: "12px", fontWeight: "600",
+                    color: trendUp === true ? "#10b981" : trendUp === false ? "#ef4444" : "var(--text-secondary)",
+                    background: trendUp === true ? "rgba(16, 185, 129, 0.1)" : trendUp === false ? "rgba(239, 68, 68, 0.1)" : "rgba(255,255,255,0.05)",
+                    padding: "4px 10px", borderRadius: "20px"
+                }}>
+                    {trendUp === true && <TrendingUp size={12} />}
+                    {trendUp === false && <TrendingUp size={12} style={{ transform: "rotate(180deg)" }} />}
+                    {trend}
+                </div>
+            )}
         </div>
-
-        <div style={{ fontSize: "30px", fontWeight: "700", color: "white" }}>
-            {value}
+        <div>
+            <h4 style={{ color: "var(--text-secondary)", fontSize: "14px", fontWeight: "500", marginBottom: "4px" }}>{title}</h4>
+            <div style={{ fontSize: "32px", fontWeight: "700", color: "white", letterSpacing: "-1px" }}>{value}</div>
         </div>
     </div>
 );
-
-
-const InsightCard = ({ text }) => (
-    <div
-        style={{
-            background: "rgba(255,255,255,0.04)",
-            padding: "12px",
-            borderRadius: "8px",
-            fontSize: "13px",
-            color: "var(--text-secondary)",
-            lineHeight: "1.5"
-        }}
-    >
-        {text}
-    </div>
-);
-
-
-const ActionButton = ({ icon, text }) => (
-    <button
-        className="btn-primary"
-        style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            padding: "10px 16px"
-        }}
-    >
-        {icon}
-        {text}
-    </button>
-);
-
-
-const StatusBadge = ({ status }) => {
-
-    const color = status === "Completed" ? "#10b981" : "#f59e0b";
-
-    return (
-        <span
-            style={{
-                fontSize: "11px",
-                padding: "4px 9px",
-                borderRadius: "6px",
-                background: `${color}20`,
-                color: color
-            }}
-        >
-            {status}
-        </span>
-    );
-};
 
 export default DoctorDashboard;

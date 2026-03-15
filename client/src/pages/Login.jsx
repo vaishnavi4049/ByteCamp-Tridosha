@@ -293,7 +293,7 @@ const Login = () => {
       if (loggedUser.role === "doctor") {
         navigate("/doctor-dashboard");
       } else {
-        navigate("/dashboard");
+        navigate("/patient-dashboard");
       }
 
     } catch (err) {

@@ -6,6 +6,13 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import DoctorDashboard from "./pages/Doctordashboard";
+import PatientDashboard from "./pages/PatientDashboard";
+import PatientLanding from "./pages/PatientLanding";
+import AIInsights from "./pages/AIInsights";
+import UserHistory from "./pages/UserHistory";
+import DoctorRequests from "./pages/DoctorRequests";
+import DoctorSettings from "./pages/DoctorSettings";
+import Chatbot from "./components/Chatbot";
 
 function AppRoutes() {
 
@@ -21,6 +28,7 @@ function AppRoutes() {
   }
 
   return (
+    <>
     <Routes>
 
       {/* Home Page */}
@@ -34,7 +42,7 @@ function AppRoutes() {
             ? <Login />
             : (
               <Navigate
-                to={user.role === "doctor" ? "/doctor-dashboard" : "/dashboard"}
+                to={user.role === "doctor" ? "/doctor-dashboard" : "/patient-landing"}
                 replace
               />
             )
@@ -51,12 +59,39 @@ function AppRoutes() {
         }
       />
 
-      {/* User Dashboard */}
+      {/* Patient Hub System */}
       <Route
-        path="/dashboard"
+        path="/patient-landing"
         element={
           user?.role === "user"
-            ? <Dashboard />
+            ? <PatientLanding />
+            : <Navigate to="/login" replace />
+        }
+      />
+
+      <Route
+        path="/generate-schedule"
+        element={
+          user?.role === "user"
+            ? <PatientDashboard />
+            : <Navigate to="/login" replace />
+        }
+      />
+
+      <Route
+        path="/ai-insights"
+        element={
+          user?.role === "user"
+            ? <AIInsights />
+            : <Navigate to="/login" replace />
+        }
+      />
+
+      <Route
+        path="/history"
+        element={
+          user?.role === "user"
+            ? <UserHistory />
             : <Navigate to="/login" replace />
         }
       />
@@ -71,7 +106,29 @@ function AppRoutes() {
         }
       />
 
+      {/* Doctor Settings */}
+      <Route
+        path="/doctor-settings"
+        element={
+          user?.role === "doctor"
+            ? <DoctorSettings />
+            : <Navigate to="/login" replace />
+        }
+      />
+
+      {/* Doctor Requests */}
+      <Route
+        path="/doctor-requests"
+        element={
+          user?.role === "doctor"
+            ? <DoctorRequests />
+            : <Navigate to="/login" replace />
+        }
+      />
+
     </Routes>
+    {user && <Chatbot />}
+    </>
   );
 }
 

@@ -54,7 +54,7 @@ const Home = () => {
         </div>
 
         <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-          <div style={{ display: 'none', gap: '2rem', '@media (min-width: 768px)': { display: 'flex' } }}>
+          <div className="hidden md:flex" style={{ gap: '2rem' }}>
             <a href="#features" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '500', transition: 'color 0.2s' }}>The Science</a>
             <a href="#how" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '500', transition: 'color 0.2s' }}>How it Works</a>
           </div>
@@ -62,7 +62,7 @@ const Home = () => {
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', borderLeft: '1px solid rgba(255, 255, 255, 0.1)', paddingLeft: '1.5rem' }}>
             {user ? (
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                <Link to="/dashboard" className="btn-primary" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '8px 16px', fontSize: '0.95rem' }}>
+                <Link to={user?.role === 'doctor' ? "/doctor-dashboard" : "/patient-landing"} className="btn-primary" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '8px 16px', fontSize: '0.95rem' }}>
                   Open App <ArrowRight size={16} />
                 </Link>
                 <button
@@ -165,7 +165,7 @@ const Home = () => {
 
             <div className="delay-200" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
               {user ? (
-                <Link to="/dashboard" className="btn-primary" style={{ padding: '14px 28px', fontSize: '1rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem', width: 'auto' }}>
+                <Link to={user?.role === 'doctor' ? "/doctor-dashboard" : "/patient-landing"} className="btn-primary" style={{ padding: '14px 28px', fontSize: '1rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem', width: 'auto' }}>
                   <Activity size={18} /> Go To Dashboard
                 </Link>
               ) : (
@@ -255,7 +255,7 @@ const Home = () => {
             <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: '2.5rem', maxWidth: '600px', margin: '0 auto 2.5rem' }}>Join the thousand of patients already experiencing the clinical benefits of chronobiology-aware prescription intelligence.</p>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               {user ? (
-                <Link to="/dashboard" className="btn-primary" style={{ display: 'inline-flex', padding: '16px 40px', fontSize: '1.1rem', width: 'auto', textDecoration: 'none', alignItems: 'center', gap: '0.5rem' }}>
+                <Link to={user?.role === 'doctor' ? "/doctor-dashboard" : "/patient-landing"} className="btn-primary" style={{ display: 'inline-flex', padding: '16px 40px', fontSize: '1.1rem', width: 'auto', textDecoration: 'none', alignItems: 'center', gap: '0.5rem' }}>
                   Go To Dashboard <ChevronRight size={20} />
                 </Link>
               ) : (

@@ -1,6 +1,9 @@
 import os
+from dotenv import load_dotenv
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+load_dotenv("../.env")
 
-if not GROQ_API_KEY:
-    raise ValueError("GROQ_API_KEY not found in environment variables")
+RECUSAL_API_KEY = os.getenv("HF_TOKEN")
+
+if not RECUSAL_API_KEY:
+    raise ValueError("HF_TOKEN not found in environment variables")

@@ -28,6 +28,8 @@ score = model.score(X_test,y_test)
 
 print("Accuracy:",score)
 
+import os
+os.makedirs("model", exist_ok=True)
 pickle.dump(model,open("model/chronomed_model.pkl","wb"))
 
 print("Model saved.")

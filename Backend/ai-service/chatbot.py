@@ -1,30 +1,31 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from groq import Groq
+from openai import OpenAI
 from dotenv import load_dotenv
 import os
 
-# Load backend .env
+# Load environment variables
 load_dotenv("../.env")
 
 app = FastAPI()
 
-# Get API key
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+# Load API key
+API_KEY = os.getenv("FEATHERLESS_API_KEY")
 
-if not GROQ_API_KEY:
-    raise ValueError("GROQ_API_KEY not found in environment variables")
+if not API_KEY:
+    raise ValueError("FEATHERLESS_API_KEY not found in environment variables")
 
-client = Groq(api_key=GROQ_API_KEY)
-
+# OpenAI compatible client for Featherless
+client = OpenAI(
+    base_url="https://api.featherless.ai/v1",
+    api_key=API_KEY
+)
 
 class ChatRequest(BaseModel):
     message: str
 
-
-# Store conversation history (last 6 messages)
+# Conversation memory
 conversation_history = []
-
 
 SYSTEM_PROMPT = """You are ChronoCare AI, a warm and knowledgeable assistant specializing in 
 chronobiology and how the body's 24-hour circadian clock influences medication timing and health.
@@ -52,7 +53,7 @@ MEMORY: You have access to the conversation history. Reference what the user sha
 
 FORMATTING RULES:
 - Use short paragraphs
-- Bold key terms using **markdown**
+- Bold key terms using markdown
 - Keep responses around 100-200 words
 - End with a follow-up question or suggestions
 
@@ -62,7 +63,6 @@ SAFETY RULES:
 - Never diagnose diseases
 - Encourage consulting healthcare professionals
 """
-
 
 WELCOME_MESSAGE = """
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -79,11 +79,9 @@ just as important as *what* you take.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """
 
-
 @app.get("/")
 def root():
     return {"message": "Chronotherapy AI service running"}
-
 
 @app.post("/chat")
 def chat(req: ChatRequest):
@@ -92,20 +90,22 @@ def chat(req: ChatRequest):
 
     try:
 
-        # Add user message
+        # Add user message to history
         conversation_history.append({
             "role": "user",
             "content": req.message
         })
 
-        # Keep only last 6 messages
+        # Keep last 6 messages only
         conversation_history = conversation_history[-6:]
 
-        # Prepare full conversation
+        # Prepare messages
         messages = [{"role": "system", "content": SYSTEM_PROMPT}] + conversation_history
 
+        # Call Featherless model
         completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="meta-llama/Llama-3.3-70B-Instruct",
+            max_tokens=4096,
             temperature=0.3,
             messages=messages
         )
@@ -120,7 +120,7 @@ def chat(req: ChatRequest):
 
         conversation_history = conversation_history[-6:]
 
-        return {"response": reply}
+        return {"reply": reply}
 
     except Exception as e:
 

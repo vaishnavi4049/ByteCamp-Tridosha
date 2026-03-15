@@ -7,7 +7,7 @@ const askAI = async (message) => {
     { message }
   );
 
-  return response.data.response;
+  return response.data.reply;
 };
 
 module.exports = { askAI };

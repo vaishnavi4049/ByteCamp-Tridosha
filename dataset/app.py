@@ -1,5 +1,9 @@
 from flask import Flask,request,jsonify
 from flask_cors import CORS
+import os
+import json
+import uuid
+from datetime import datetime
 import pickle
 import pandas as pd
 from chronotherapy import medication_time
@@ -174,6 +178,7 @@ def create_doctor_request():
         "doctor_time": data.get("doctor_time"),
         "improvement_score": data.get("improvement_score"),
         "patient_parameters": data.get("patient_parameters", {}),
+        "has_pdf_attached": data.get("has_pdf_attached", False),
         "status": "pending",
         "timestamp": datetime.now().isoformat()
     }
@@ -256,4 +261,4 @@ def get_patient_status(patient_id):
 # ---------- RUN SERVER ----------
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5001)

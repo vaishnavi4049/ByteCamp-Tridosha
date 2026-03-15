@@ -3,13 +3,9 @@ export default {
 
     plugins: {
       autoprefixer: {},
+      tailwindcss:{},
     },
   }
 
 
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-  },
-}
 

@@ -56,13 +56,30 @@ const UserHistory = () => {
   })) : [];
 
   return (
-    <div>
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">History & Analytics</h1>
-          <p className="page-subtitle">Track your AI chronotherapy predictions and view aggregated health insights over time.</p>
+    <div style={{ minHeight: '100vh', width: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      <div className="bg-grid"></div>
+
+      {/* Background glow effects */}
+      <div style={{
+        position: 'absolute', top: '10%', right: '10%', width: '40vw', height: '40vw',
+        background: 'radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, transparent 60%)',
+        borderRadius: '50%', zIndex: -1, pointerEvents: 'none'
+      }}></div>
+
+      <div style={{
+        position: 'absolute', bottom: '10%', left: '5%', width: '50vw', height: '50vw',
+        background: 'radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 60%)',
+        borderRadius: '50%', zIndex: -1, pointerEvents: 'none'
+      }}></div>
+
+      <div style={{ padding: '2rem 5%', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
+        <div style={{ marginBottom: '2.5rem', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', paddingBottom: '1.5rem' }}>
+          <h1 style={{ fontSize: '2.5rem', fontWeight: '800', color: 'white', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', letterSpacing: '-0.02em' }}>
+            <Calendar className="pulse-glow" color="var(--accent-color)" size={32} style={{ borderRadius: '50%' }} />
+            History & Analytics
+          </h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>Track your AI chronotherapy predictions and view aggregated health insights over time.</p>
         </div>
-      </div>
 
       {history.length === 0 ? (
         <div className="glass-panel" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
@@ -181,6 +198,7 @@ const UserHistory = () => {
           </div>
         </>
       )}
+      </div>
     </div>
   );
 };

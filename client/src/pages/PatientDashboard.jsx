@@ -111,7 +111,8 @@ const PatientDashboard = () => {
         ai_time: prediction.ai_recommended_time,
         doctor_time: prediction.doctor_recommended_time,
         improvement_score: prediction.predicted_improvement_score,
-        patient_parameters: formData
+        patient_parameters: formData,
+        has_pdf_attached: true
       });
       setRequestStatus("pending");
       checkPatientStatus();
@@ -121,13 +122,30 @@ const PatientDashboard = () => {
   };
 
   return (
-    <div>
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Patient Dashboard</h1>
-          <p className="page-subtitle">Enter medical parameters to generate an AI chronotherapy schedule.</p>
+    <div style={{ minHeight: '100vh', width: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      <div className="bg-grid"></div>
+
+      {/* Background glow effects */}
+      <div style={{
+        position: 'absolute', top: '10%', right: '10%', width: '40vw', height: '40vw',
+        background: 'radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, transparent 60%)',
+        borderRadius: '50%', zIndex: -1, pointerEvents: 'none'
+      }}></div>
+
+      <div style={{
+        position: 'absolute', bottom: '10%', left: '5%', width: '50vw', height: '50vw',
+        background: 'radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 60%)',
+        borderRadius: '50%', zIndex: -1, pointerEvents: 'none'
+      }}></div>
+
+      <div style={{ padding: '2rem 5%', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
+        <div style={{ marginBottom: '2.5rem', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', paddingBottom: '1.5rem' }}>
+          <h1 style={{ fontSize: '2.5rem', fontWeight: '800', color: 'white', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', letterSpacing: '-0.02em' }}>
+            <Activity className="pulse-glow" color="var(--accent-color)" size={32} style={{ borderRadius: '50%' }} />
+            Predictive Schedule Generator
+          </h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>Enter physical parameters to compute your precise chronobiological medication delivery window.</p>
         </div>
-      </div>
 
       {/* Patient Notifications for Doctor Review */}
       {latestRequest && requestStatus !== "none" && requestStatus !== "pending" && (
@@ -147,9 +165,14 @@ const PatientDashboard = () => {
         </div>
       )}
 
-      <div className="grid-2">
+      <div className="grid-2" style={{ gap: '3rem' }}>
         {/* Input Form Column */}
-        <form onSubmit={handleSubmit} className="glass-panel" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', height: 'fit-content' }}>
+        <form onSubmit={handleSubmit} className="glass-panel" style={{ 
+          display: 'flex', flexDirection: 'column', gap: '1.5rem', height: 'fit-content',
+          background: 'linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.7) 100%)',
+          border: '1px solid rgba(16, 185, 129, 0.15)',
+          boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.3)'
+        }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', borderBottom: '1px solid var(--border-dark)', paddingBottom: '1rem' }}>
             <Search color="var(--color-healthcare-main)" />
             <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>Medical Parameters</h2>
@@ -211,8 +234,8 @@ const PatientDashboard = () => {
             </div>
           </div>
 
-          <button type="submit" disabled={isLoading} className="btn-primary" style={{ marginTop: '1rem' }}>
-            {isLoading ? <span className="animate-pulse">Analyzing...</span> : <>Generate AI Medication Schedule <Activity size={18} /></>}
+          <button type="submit" disabled={isLoading} className="btn-primary" style={{ marginTop: '1.5rem', padding: '16px', fontSize: '1.1rem' }}>
+            {isLoading ? <span className="animate-pulse">Processing Biological Data...</span> : <>Generate AI Medication Schedule <Activity size={20} /></>}
           </button>
         </form>
 
@@ -241,11 +264,20 @@ const PatientDashboard = () => {
                     <button
                       onClick={handleDoctorRequest}
                       disabled={requestStatus === "pending" || requestStatus === "approved" || requestStatus === "rejected"}
-                      className={(requestStatus === "pending" || requestStatus === "approved" || requestStatus === "rejected") ? "btn-success" : "btn-outline-danger"}
-                      style={{ marginTop: '1rem', width: 'auto', padding: '0.5rem 1rem' }}
+                      className={(requestStatus === "pending" || requestStatus === "approved" || requestStatus === "rejected") ? "btn-success" : "btn-primary"}
+                      style={{ marginTop: '1.5rem', width: 'auto', padding: '12px 24px', display: 'inline-flex', alignItems: 'center', gap: '8px', transition: 'all 0.3s ease' }}
                     >
-                      <Send size={16} />
-                      {requestStatus === "pending" ? 'Sent for Doctor Review' : 'Consult Doctor'}
+                      {requestStatus === "pending" ? (
+                        <>
+                          <CheckCircle size={18} />
+                          Medical PDF Report Sent to Doctor
+                        </>
+                      ) : (
+                        <>
+                          <Send size={18} />
+                          Send Report for Doctor Review
+                        </>
+                      )}
                     </button>
                   )}
                 </div>
@@ -296,6 +328,7 @@ const PatientDashboard = () => {
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );
